@@ -1,0 +1,270 @@
+body {
+    background-color: #fbe8a6;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+}
+
+.hidden {
+    opacity: 0;
+}
+
+.earth, .signUpPage {
+    opacity: 1; 
+    animation: slideInFromRight 2s ease-out forwards;
+}
+
+@keyframes slideInFromRight {
+    0% {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.signUpPage {
+    background-color: white;
+    border-radius: 36px 0px 0px 36px;
+    height: 100vh;
+    width: 70vw;
+    margin-left: auto;
+    margin-right: 0;
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex; /* Centering setup */
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.earth {
+    width: clamp(22rem, 20vw, 30rem);
+    height: clamp(20rem, 18vw, 25rem);
+    z-index: 10;
+    position: relative;
+    left: 10vw;
+}
+
+.fields {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    justify-content: center; 
+    width: 100%; 
+    max-width: 400px;
+    text-align: center;
+}
+
+.fieldText {
+    font-family: 'Poppins';
+    font-size: 32px;
+    font-weight: 500;
+    margin-bottom: 0.5rem; 
+}
+
+.fieldText2 {
+    font-family: 'Poppins';
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 0.5rem; 
+}
+
+.fieldLabels {
+    font-family: 'Poppins';
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    text-align: left;
+    width: 100%;
+    max-width: 400px;
+}
+
+.inputField {
+    width: 400px;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    border: 2px solid black;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.inputField:focus {
+    border-color: #f4976c;
+}
+
+.submitButton {
+    width: 200px;
+    padding: 0.75rem;
+    background-color: #f4976c;
+    color: white;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 1rem
+}
+
+.submitButton:hover {
+    background-color: #303c6c;
+}
+
+.submitButton2 {
+    width: 200px;
+    padding: 0.75rem;
+    background-color: #f4976c;
+    color: white;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 2.5rem
+}
+
+.submitButton:hover, .submitButton2:hover {
+    background-color: #303c6c;
+}
+
+.termsWrapper {
+    margin-top: 1rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 9px;
+    text-align: left;
+}
+
+.termsWrapper label {
+    display: flex;
+    align-items: center;
+}
+
+.termsWrapper a {
+    color: #f4976c;
+    text-decoration: none;
+}
+
+.termsWrapper a:hover {
+    text-decoration: underline;
+}
+
+.passwordWrapper {
+    position: relative;
+}
+
+.eyeIcon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.popup {
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+    visibility: hidden; /* Start hidden */
+    opacity: 0;
+    transition: opacity 0.5s ease, visibility 0s 0.5s; /* Add a delay for visibility */
+}
+
+.popup.show {
+    visibility: visible;
+    opacity: 1; /* Fade in */
+    transition: opacity 0.5s ease;
+}
+
+.popup.hide {
+    opacity: 0; /* Fade out */
+    visibility: hidden;
+    transition: opacity 0.5s ease, visibility 0s 0.5s; /* Delay hiding visibility */
+}
+
+.popup-content {
+    text-align: justify;
+    font-family: 'Inter';
+    font-size: 14px;
+    background-color: white;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888888;
+    width: 50%;
+    font-weight: bolder;
+    max-height: 60vh; 
+    overflow-y: auto;
+    border-radius: 15px;
+}
+        
+.title {
+    text-align: center;
+    font-family: 'Inter';
+}
+
+.popup-content button {
+    display: block;
+    margin: 0 auto;
+}
+
+.closeButton {
+    cursor: pointer;
+    padding: 10px;
+    font-family: 'Inter';
+    color: black;
+    background-color: #fbe8a6;
+    text-decoration: none;
+    border-radius: 15px;
+    font-size: clamp(0.875rem, 1vw + 0.5rem, 1rem);
+    transition: background-color 0.5s ease, color 0.3s ease;
+    border: none;
+}
+.closeButton:hover {
+    background-color: black;
+    color: white;
+}
+
+.aboutNav {
+    display: flex;
+    flex-direction: row;
+    background-color: #f4976c;
+    border-radius: 15px;
+    width: 1040px;
+    height: 40px;
+    gap: 100px;
+    justify-content: center;
+    align-items: center;
+}
+
+.aboutNavText {
+    color: #7e7e7e;
+    font-family: 'Inter';
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+
+.aboutNavText {
+    font-family: 'Inter';
+    font-size: 13px;
+    font-weight: 500;
+}
+

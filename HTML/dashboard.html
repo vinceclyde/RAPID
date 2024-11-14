@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/dashboard.css">
+    <link rel="icon" href="https://i.ibb.co/XCjDk5m/placeholder.png">
+    <title>RAPID Dashboard</title>
+</head>
+<body>
+    <div class="navBar">
+        <p id="dashboard" class="navBarText">Dashboard</p>
+        <p id="locatorMap" class="navBarText">Locator Map</p>
+        <p id="storeRegistration" class="navBarText">Store Registration</p>
+        <p id="alertCenter" class="navBarText">Alert Center</p>
+        <div class="help">
+            <a href="about.html" target="_blank"><img src="https://i.ibb.co/ZYyVc52/Help-circle.png"></a>
+        </div>
+    </div>
+
+    <!-- Dynamic content area -->
+    <div id="contentArea"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const contentArea = document.getElementById("contentArea");
+            const navItems = document.querySelectorAll(".navBarText");
+
+            // Function to load HTML content from a file
+            function loadContent(file) {
+        fetch(file)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Could not load ${file}`);
+                }
+                return response.text();
+            })
+            .then(data => {
+                contentArea.innerHTML = data;
+            })
+            .catch(error => {
+                console.error("Error loading content:", error);
+                contentArea.innerHTML = "<p>Content not available.</p>";
+            });
+    }
+
+            // Function to update active class on navbar
+            function setActiveNavItem(activeItem) {
+                navItems.forEach(item => item.classList.remove("active"));
+                activeItem.classList.add("active");
+            }
+
+            // Load "Dashboard" by default on page load
+            loadContent("dashboardContent.html");
+            setActiveNavItem(document.getElementById("dashboard"));
+
+            // Event listeners for each nav item
+            document.getElementById("dashboard").addEventListener("click", () => {
+                loadContent("dashboardContent.html");
+                setActiveNavItem(document.getElementById("dashboard"));
+            });
+            document.getElementById("locatorMap").addEventListener("click", () => {
+                loadContent("locator.html");
+                setActiveNavItem(document.getElementById("locatorMap"));
+            });
+            document.getElementById("storeRegistration").addEventListener("click", () => {
+                loadContent("register-store.html");
+                setActiveNavItem(document.getElementById("storeRegistration"));
+            });
+            document.getElementById("alertCenter").addEventListener("click", () => {
+                loadContent("alert-center.html");
+                setActiveNavItem(document.getElementById("alertCenter"));
+            });
+        });
+    </script>
+</body>
+</html>
