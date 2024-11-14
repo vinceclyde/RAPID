@@ -13,6 +13,7 @@
         <p id="dashboard" class="navBarText">Dashboard</p>
         <p id="locatorMap" class="navBarText">Locator Map</p>
         <p id="storeRegistration" class="navBarText">Store Registration</p>
+        <p id="roadClosure" class="navBarText">Road Closures</p>
         <p id="alertCenter" class="navBarText">Alert Center</p>
         <div class="help">
             <a href="about.html" target="_blank"><img src="https://i.ibb.co/ZYyVc52/Help-circle.png"></a>
@@ -71,6 +72,10 @@
             document.getElementById("alertCenter").addEventListener("click", () => {
                 loadContent("alert-center.html");
                 setActiveNavItem(document.getElementById("alertCenter"));
+            });
+            document.getElementById("roadClosure").addEventListener("click", () => {
+                loadContent("road-closure.html");
+                setActiveNavItem(document.getElementById("dashboard"));
             });
         });
     </script>
