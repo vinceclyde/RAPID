@@ -1,5 +1,5 @@
 <p align="center">
-   RAPID
+   <img src="https://i.ibb.co/6ZNwbCV/ezgif-6-51715561e0.gif" width="90px" height="90px"
 </p>
 
 
