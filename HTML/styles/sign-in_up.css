@@ -268,3 +268,24 @@ body {
     font-weight: 500;
 }
 
+@media (max-width: 600px) {
+    .signUpPage {
+        width: 100vw;
+        border-radius: 0;
+        height: 100%;
+    }
+
+    .earth {
+        display: none;
+    }
+
+    .inputField, .submitButton, .submitButton2 {
+        width: 90%;
+    }
+
+    .aboutNav {
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+}
