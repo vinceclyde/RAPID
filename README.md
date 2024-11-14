@@ -10,7 +10,6 @@
 - [Introduction](#introduction)
 - [Features](#features)
 - [Tech Stack](#stack)
-- [Prerequisites](#prereqs)
 - [Preview](#preview)
 - [Member Portfolio](#members)
 - [Important Links](#links)
@@ -42,9 +41,24 @@
 
 ### <a name="stack"></a>
 ## 🤖 Tech Stack
+<h3><b>Frontend Development</b></h3>
+⦿ <b>HTML</b><br>
+⦿ <b>CSS</b><br>
+<h3><b>Data Storage and Management</b></h3>
+<h3><b>Tools</b></h3>
+<p>⦿ Node.js</p>
+<pre><code>node -v</code></pre>
+<p>⦿ Node Package Manager</p>
+<pre><code>npm -v</code></pre>
+<h3><b>Dependencies/Modules</b></h3>
+⦿ <b>express</b> - The web framework used to handle routes and requests.<br>
+⦿ <b>cors</b> - Middleware to enable Cross-Origin Resource Sharing (CORS).<br>
+⦿ <b>bcryptjs</b> - For password hashing and validation.<br>
+⦿ <b>body-parse</b> - Middleware for parsing JSON request bodies <br>
+⦿ <b>mongodb</b> - MongoDB client to connect and interact with MongoDB database.<br><br>
+<pre><code>npm install express cors bcryptjs body-parser mongodb</code></pre>
 
-### <a name="prereqs"></a>
-## 💻 Prerequisites
+
 
 ### <a name="preview"></a>
 ## 🫣 Preview
