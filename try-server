@@ -6,30 +6,31 @@ const { MongoClient } = require('mongodb');
 const app = express();
 
 // Use CORS middleware
-app.use(cors()); // This allows all origins, you can configure it further
+app.use(cors());
 
 // Middleware to parse JSON requests
 app.use(bodyParser.json());
 
 const uri = "mongodb+srv://mimikyow:rapid@rapid.5uvhi.mongodb.net/?retryWrites=true&w=majority&appName=RAPID";
-const client = new MongoClient(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-});
+const client = new MongoClient(uri);
 
-let storesCollection; // This will hold the reference to the stores collection
+let storesCollection;
 
-// Connect to MongoDB
-client.connect()
-    .then(() => {
-        storesCollection = client.db('RAPID').collection('stores'); // Use 'stores' as the collection name
+// Initialize the database connection
+async function initializeDatabase() {
+    try {
+        await client.connect(); // Connect to the MongoDB server
         console.log('Connected to MongoDB');
-    })
-    .catch((err) => {
+        storesCollection = client.db('RAPID').collection('stores'); // Reference the collection
+    } catch (err) {
         console.error('Error connecting to MongoDB:', err);
-    });
+        process.exit(1); // Exit if the database connection fails
+    }
+}
 
-// Store registration endpoint
+initializeDatabase();
+
+// Endpoint to register a new store
 app.post('/register-store', async (req, res) => {
     const { name, address, hours, contact, supplyType, supplyStatus } = req.body;
 
@@ -56,10 +57,14 @@ app.post('/register-store', async (req, res) => {
     }
 });
 
-// Endpoint to retrieve all registered stores
+// Endpoint to get all registered stores
 app.get('/get-stores', async (req, res) => {
     try {
-        const stores = await storesCollection.find().toArray();
+        if (!storesCollection) {
+            throw new Error('Database not initialized');
+        }
+
+        const stores = await storesCollection.find({}).toArray();
         res.json(stores);
     } catch (err) {
         console.error('Error fetching stores:', err);
@@ -67,10 +72,7 @@ app.get('/get-stores', async (req, res) => {
     }
 });
 
-
-// Set up the server to listen on port 5000
+// Start the server on port 5000
 app.listen(5000, () => {
     console.log('Server running on port 5000');
 });
-
-
