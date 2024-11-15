@@ -72,37 +72,37 @@
 <div align="center">
 <table style="width: 100%; table-layout: auto;">
   <tr>
-    <th style="width: 80px; text-align: center;">
+    <th style="width: 30px; text-align: center;">
       <img src="https://i.ibb.co/4ftLLzz/400157860-725047402815272-7964848878070784083-n-removebg-preview.png" width="55%">
     </th>
     <td>
       <div align="left"><strong>💡Eljay P. Marasigan</strong><br>
         ➟ Leader/Frontend Developer<br>
-        ➟ 22-05538@g.batstate-u.edu.ph<br>
+        ➟ 22-05538<br>
         🎧 <b>BMW</b> - Because ft. Leslie
       </div>
     </td>
   </tr>
   <tr>
-    <th style="width: 80px; text-align: center;">
+    <th style="width: 30px; text-align: center;">
       <img src="https://i.ibb.co/QDSJRky/116318209-removebg-preview.png" width="55%">
     </th>
     <td>
       <div align="left"><strong>💡Iemerie Jom C. Manguit</strong><br>
         ➟ Backend Developer<br>
-        ➟ 22-09658@g.batstate-u.edu.ph<br>
+        ➟ 22-09658<br>
         🎧 <b>Labyrinth</b> - Taylor Swift
       </div>
     </td>
   </tr>
   <tr>
-    <th style="width: 80px; text-align: center;">
+    <th style="width: 30px; text-align: center;">
       <img src="https://i.ibb.co/MZMmvPN/Passport-Picture-1-removebg-preview.png" width="55%">
     </th>
     <td>
       <div align="left"><strong>💡Vince Clyde S. Banaag</strong><br>
         ➟ Full Stack Developer/Project Manager<br>
-        ➟ 22-06373@g.batstate-u.edu.ph<br>
+        ➟ 22-06373<br>
         🎧 <b>Star Signs</b> - LE SSERAFIM
       </div>
     </td>
