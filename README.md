@@ -116,19 +116,19 @@
    <tr>
       <td width="25%">
          <div align="center">
-            <a href="https://docs.google.com/document/d/1Raenmkpt2GracyI4hoXgJgwdfaF5s1DC/edit?usp=sharing&ouid=112972098088168384042&rtpof=true&sd=true"><img src="https://i.ibb.co/zGM2VWL/plan-28-1.png" height="100"></a>
+            <a href="https://docs.google.com/document/d/1Raenmkpt2GracyI4hoXgJgwdfaF5s1DC/edit?usp=sharing&ouid=112972098088168384042&rtpof=true&sd=true" target="_blank"><img src="https://i.ibb.co/zGM2VWL/plan-28-1.png" height="100"></a>
             <p>Project Plan</p>
          </div>
       </td>
       <td width="25%">
          <div align="center">
-            <a href="https://drive.google.com/drive/folders/14YdWsfNPUnofs25Nddq7WoeR5iHhVD_q?usp=sharing"><img src="https://i.ibb.co/HLyN6mr/9746449.png" width="100" height="100"></a>
+            <a href="https://drive.google.com/drive/folders/14YdWsfNPUnofs25Nddq7WoeR5iHhVD_q?usp=sharing" target="_blank"><img src="https://i.ibb.co/HLyN6mr/9746449.png" width="100" height="100"></a>
             <p>Project Documentation</p>
          </div>
       </td>
       <td width="25%">
          <div align="center">
-            <a href="https://www.figma.com/proto/kvVTjMtBxn3BxBEt7yKiMC/RAPID?node-id=1-3&t=fUxihvhNzw4plitc-1"><img src="https://i.ibb.co/ZJKs3pm/4595100.png" width="100" height="100"></a>
+            <a href="https://www.figma.com/proto/kvVTjMtBxn3BxBEt7yKiMC/RAPID?node-id=1-3&t=fUxihvhNzw4plitc-1" target="_blank"><img src="https://i.ibb.co/ZJKs3pm/4595100.png" width="100" height="100"></a>
             <p>Initial Interface Design (Figma)</p>
          </div>
       </td>
