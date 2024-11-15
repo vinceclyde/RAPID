@@ -14,22 +14,19 @@
         <label class="label" for="storeName">Store Name:</label>
         <input class="input" type="text" id="storeName" required><br>
 
-        <label class="label" for="storeAddress">Address:</label>
-        <input class="input" type="text" id="storeAddress" required><br>
+        <div id="map" style="height: 400px; width: 100%; margin-bottom: 15px;"></div>
 
-        <div class="regStoreSubCon">
-            <div class="field">
-                <label class="label" for="storeHours">Store Hours</label>
-                <input class="input2" type="text" id="storeHours" required>
-            </div>
-            <div class="field">
-                <label class="label" for="contactNumber">Contact Number</label>
-                <input class="input2" type="text" id="contactNumber" required>
-            </div>
-        </div>
-        
-        <div class="regStoreSubCon">
-        <fieldset class="supply">
+        <label for="storeAddress">Address:</label>
+        <input type="text" id="storeAddress" placeholder="Type an address..." required><br>
+        <ul id="suggestions"></ul>
+
+        <label for="storeHours">Store Hours:</label>
+        <input type="text" id="storeHours" required><br>
+
+        <label for="contactNumber">Contact Number:</label>
+        <input type="text" id="contactNumber" required><br>
+
+        <fieldset>
             <legend>Supply Type:</legend>
             <label><input type="radio" name="supplyType" value="water"> Water</label><br>
             <label><input type="radio" name="supplyType" value="medical"> Medical</label><br>
@@ -48,58 +45,60 @@
         <button type="button" class="submitButton" onclick="registerStore()">REGISTER</button>
         </div>
     </form>
-</div>
-</div>
-<script>
-    const apiBaseUrl = 'http://localhost:5000';
 
-// Fetch stores from the database and display them
-async function fetchStores() {
-    try {
-        const response = await fetch(`${apiBaseUrl}/get-stores`);
-        const stores = await response.json();
+    <h2>Registered Stores:</h2>
+    <div id="storeList"></div>
 
-        if (Array.isArray(stores)) {
-            displayStores(stores);
-        } else {
-            console.error("Invalid response format:", stores);
+    <script>
+        const apiBaseUrl = 'http://localhost:5000';
+
+        // Fetch stores from the database and display them
+        async function fetchStores() {
+            try {
+                const response = await fetch(`${apiBaseUrl}/get-stores`);
+                const stores = await response.json();
+
+                if (Array.isArray(stores)) {
+                    displayStores(stores);
+                } else {
+                    console.error("Invalid response format:", stores);
+                }
+            } catch (error) {
+                console.error("Error fetching stores:", error);
+            }
         }
-    } catch (error) {
-        console.error("Error fetching stores:", error);
-    }
-}
 
-// Display stores in the UI
-function displayStores(stores) {
-    const storeList = document.getElementById("storeList");
-    storeList.innerHTML = ""; // Clear the existing list
-    stores.forEach(store => {
-        const storeInfo = document.createElement("div");
-        storeInfo.innerHTML = `
-            <strong>${store.name}</strong><br>
-            Address: ${store.address}<br>
-            Hours: ${store.hours}<br>
-            Contact: ${store.contact}<br>
-            Supply Type: ${store.supplyType}<br>
-            Supply Status: ${store.supplyStatus}<br><br>
-        `;
-        storeList.appendChild(storeInfo);
-    });
-}
+        // Display stores in the UI
+        function displayStores(stores) {
+            const storeList = document.getElementById("storeList");
+            storeList.innerHTML = ""; // Clear the existing list
+            stores.forEach(store => {
+                const storeInfo = document.createElement("div");
+                storeInfo.innerHTML = `
+                    <strong>${store.name}</strong><br>
+                    Address: ${store.address}<br>
+                    Hours: ${store.hours}<br>
+                    Contact: ${store.contact}<br>
+                    Supply Type: ${store.supplyType}<br>
+                    Supply Status: ${store.supplyStatus}<br><br>
+                `;
+                storeList.appendChild(storeInfo);
+            });
+        }
 
-// Register a new store
-async function registerStore() {
-    const storeName = document.getElementById("storeName").value;
-    const storeAddress = document.getElementById("storeAddress").value;
-    const storeHours = document.getElementById("storeHours").value;
-    const contactNumber = document.getElementById("contactNumber").value;
-    const supplyType = document.querySelector('input[name="supplyType"]:checked') ? document.querySelector('input[name="supplyType"]:checked').value : "";
-    const supplyStatus = document.querySelector('input[name="supplyStatus"]:checked') ? document.querySelector('input[name="supplyStatus"]:checked').value : "";
+        // Register a new store
+        async function registerStore() {
+            const storeName = document.getElementById("storeName").value;
+            const storeAddress = document.getElementById("storeAddress").value;
+            const storeHours = document.getElementById("storeHours").value;
+            const contactNumber = document.getElementById("contactNumber").value;
+            const supplyType = document.querySelector('input[name="supplyType"]:checked') ? document.querySelector('input[name="supplyType"]:checked').value : "";
+            const supplyStatus = document.getElementById("supplyStatus").value;
 
-    if (!storeName || !storeAddress || !storeHours || !contactNumber || !supplyType || !supplyStatus) {
-        alert("Please fill out all fields.");
-        return;
-    }
+            if (!storeName || !storeAddress || !storeHours || !contactNumber || !supplyType) {
+                alert("Please fill out all fields.");
+                return;
+            }
 
     const store = {
         name: storeName,
@@ -110,24 +109,24 @@ async function registerStore() {
         supplyStatus: supplyStatus
     };
 
-    try {
-        const response = await fetch(`${apiBaseUrl}/register-store`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(store)
-        });
-        const data = await response.json();
+            try {
+                const response = await fetch(`${apiBaseUrl}/register-store`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(store)
+                });
+                const data = await response.json();
 
-        if (data.message) {
-            alert(data.message);
-            fetchStores(); // Refresh the store list after registration
-        } else {
-            console.error("Error registering store:", data);
+                if (data.message) {
+                    alert(data.message);
+                    fetchStores(); // Refresh the store list after registration
+                } else {
+                    console.error("Error registering store:", data);
+                }
+            } catch (error) {
+                console.error("Error registering store:", error);
+            }
         }
-    } catch (error) {
-        console.error("Error registering store:", error);
-    }
-}
 
 // Fetch and display stores on page load
 fetchStores();

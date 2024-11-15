@@ -163,3 +163,42 @@ a {
     text-decoration: none; /* Remove underline */
     color: inherit; /* Inherit color from parent element */
 }
+
+@media screen and (max-width: 600px) {
+    body {
+        flex-direction: column;
+        justify-content: flex-start;
+        padding: 20px;
+        height: auto;
+        overflow: auto;
+    }
+
+    .aboutNav {
+        flex-direction: column;
+        width: 100%;
+        height: auto;
+        gap: 5px;
+        padding: 5px;
+        border-radius: 10px;
+    }
+
+    .aboutNavText {
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .container {
+        width: 95%;
+        padding: 10px;
+    }
+
+    .gtText, .gtText2 {
+        font-size: 12px;
+        padding: 10px;
+    }
+    
+    .faqTitle {
+        font-size: clamp(16px, 4vw, 28px);
+    }
+    
+}

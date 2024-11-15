@@ -72,6 +72,55 @@ app.get('/get-stores', async (req, res) => {
     }
 });
 
+// Endpoint to update an existing store
+app.put('/update-store/:id', async (req, res) => {
+    const { id } = req.params;
+    const { name, address, hours, contact, supplyType, supplyStatus } = req.body;
+
+    try {
+        // Validate the required fields
+        if (!name || !address || !hours || !contact || !supplyType || !supplyStatus) {
+            return res.status(400).json({ error: 'All fields are required' });
+        }
+
+        const updatedStore = { name, address, hours, contact, supplyType, supplyStatus };
+
+        const result = await storesCollection.updateOne(
+            { _id: new MongoClient.ObjectId(id) },
+            { $set: updatedStore }
+        );
+
+        if (result.modifiedCount > 0) {
+            res.json({ message: 'Store updated successfully' });
+        } else {
+            res.status(404).json({ error: 'Store not found' });
+        }
+    } catch (err) {
+        console.error('Error updating store:', err);
+        res.status(500).json({ error: 'Error updating store' });
+    }
+});
+
+// Endpoint to delete a store
+app.delete('/delete-store/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const result = await storesCollection.deleteOne({ _id: new MongoClient.ObjectId(id) });
+
+        if (result.deletedCount > 0) {
+            res.json({ message: 'Store deleted successfully' });
+        } else {
+            res.status(404).json({ error: 'Store not found' });
+        }
+    } catch (err) {
+        console.error('Error deleting store:', err);
+        res.status(500).json({ error: 'Error deleting store' });
+    }
+});
+
+
+
 // Start the server on port 5000
 app.listen(5000, () => {
     console.log('Server running on port 5000');
