@@ -85,7 +85,7 @@
   </tr>
   <tr>
     <th style="width: 80px; text-align: center;">
-      <img src="https://i.ibb.co/QDSJRky/116318209-removebg-preview.png" width="70%">
+      <img src="https://i.ibb.co/QDSJRky/116318209-removebg-preview.png" width="55%">
     </th>
     <td>
       <div align="left"><strong>💡Iemerie Jom C. Manguit</strong><br>
@@ -97,7 +97,7 @@
   </tr>
   <tr>
     <th style="width: 80px; text-align: center;">
-      <img src="https://i.ibb.co/MZMmvPN/Passport-Picture-1-removebg-preview.png" width="70%">
+      <img src="https://i.ibb.co/MZMmvPN/Passport-Picture-1-removebg-preview.png" width="55%">
     </th>
     <td>
       <div align="left"><strong>💡Vince Clyde S. Banaag</strong><br>
