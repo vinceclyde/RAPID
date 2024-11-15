@@ -42,9 +42,9 @@
 ### <a name="stack"></a>
 ## 🤖 Tech Stack
 <h3><b>Frontend Development</b></h3>
-⦿ <b>HTML</b><br>
-⦿ <b>CSS</b><br>
-⦿ <b>JavaScript</b>
+⦿ <b>HTML</b> - forms the structure of the RAPID webpage.<br>
+⦿ <b>CSS</b> - controls RAPID's visual design and responsiveness, thus making the pages aesthetically pleasing and adaptable to different screen sizes.<br>
+⦿ <b>JavaScript</b> - adds interactivity and dynamic functionality to RAPID, enabling features like animations, form validation, and data fetching.
 <h3><b>Data Storage and Management</b></h3>
 ⦿ <b>MongoDB Cloud</b> - used to store user and store information.<br>
 ⦿ <b>Supabase</b> - used to store unstructured data, particulary image files.<br>
