@@ -68,77 +68,91 @@
 
 ### <a name="members"></a>
 ## :shipit: Member Portfolio
+
 <div align="center">
-<table style="width: 100%; table-layout: fixed;">
+<table style="width: 100%; table-layout: auto;">
   <tr>
-    <th style="width: 120px;">
-      <img src="https://i.ibb.co/4ftLLzz/400157860-725047402815272-7964848878070784083-n-removebg-preview.png" width="100" height="100"/>
+    <th style="width: 80px; text-align: center;">
+      <img src="https://i.ibb.co/4ftLLzz/400157860-725047402815272-7964848878070784083-n-removebg-preview.png" width="55%">
     </th>
     <td>
       <div align="left"><strong>💡Eljay P. Marasigan</strong><br>
         ➟ Leader/Frontend Developer<br>
-        ➟ 22-05538@g.batstate-u.edu.ph<br>
+        ➟ 22-05538<br>
         🎧 <b>BMW</b> - Because ft. Leslie
       </div>
     </td>
   </tr>
   <tr>
-    <th style="width: 120px;">
-      <img src="https://i.ibb.co/QDSJRky/116318209-removebg-preview.png" width="100" height="100"/>
+    <th style="width: 80px; text-align: center;">
+      <img src="https://i.ibb.co/QDSJRky/116318209-removebg-preview.png" width="55%">
     </th>
     <td>
       <div align="left"><strong>💡Iemerie Jom C. Manguit</strong><br>
         ➟ Backend Developer<br>
-        ➟ 22-09658@g.batstate-u.edu.ph<br>
+        ➟ 22-09658<br>
         🎧 <b>Labyrinth</b> - Taylor Swift
       </div>
     </td>
   </tr>
   <tr>
-    <th style="width: 120px;">
-      <img src="https://i.ibb.co/MZMmvPN/Passport-Picture-1-removebg-preview.png" width="95" height="100"/>
+    <th style="width: 80px; text-align: center;">
+      <img src="https://i.ibb.co/MZMmvPN/Passport-Picture-1-removebg-preview.png" width="55%">
     </th>
     <td>
       <div align="left"><strong>💡Vince Clyde S. Banaag</strong><br>
         ➟ Full Stack Developer/Project Manager<br>
-        ➟ 22-06373@g.batstate-u.edu.ph<br>
+        ➟ 22-06373<br>
         🎧 <b>Star Signs</b> - LE SSERAFIM
       </div>
     </td>
   </tr>
 </table>
 </div>
+
+
+
      
 ### <a name="links"></a>
 ## 🔗 Important Links
+
 <div align="center">
 <table width="100%">
    <tr>
       <td width="25%">
          <div align="center">
-            <a href="https://docs.google.com/document/d/1Raenmkpt2GracyI4hoXgJgwdfaF5s1DC/edit?usp=sharing&ouid=112972098088168384042&rtpof=true&sd=true"><img src="https://i.ibb.co/zGM2VWL/plan-28-1.png" height="100"></a>
+            <a href="https://docs.google.com/document/d/1Raenmkpt2GracyI4hoXgJgwdfaF5s1DC/edit?usp=sharing&ouid=112972098088168384042&rtpof=true&sd=true">
+               <img src="https://i.ibb.co/zGM2VWL/plan-28-1.png" width="55%">
+            </a>
             <p>Project Plan</p>
          </div>
       </td>
       <td width="25%">
          <div align="center">
-            <a href="https://drive.google.com/drive/folders/14YdWsfNPUnofs25Nddq7WoeR5iHhVD_q?usp=sharing"><img src="https://i.ibb.co/HLyN6mr/9746449.png" width="100" height="100"></a>
+            <a href="https://drive.google.com/drive/folders/14YdWsfNPUnofs25Nddq7WoeR5iHhVD_q?usp=sharing">
+               <img src="https://i.ibb.co/HLyN6mr/9746449.png" width="55%">
+            </a>
             <p>Project Documentation</p>
          </div>
       </td>
       <td width="25%">
          <div align="center">
-            <a href="https://www.figma.com/proto/kvVTjMtBxn3BxBEt7yKiMC/RAPID?node-id=1-3&t=fUxihvhNzw4plitc-1" ><img src="https://i.ibb.co/ZJKs3pm/4595100.png" width="100" height="100"></a>
+            <a href="https://www.figma.com/proto/kvVTjMtBxn3BxBEt7yKiMC/RAPID?node-id=1-3&t=fUxihvhNzw4plitc-1">
+               <img src="https://i.ibb.co/ZJKs3pm/4595100.png" width="55%">
+            </a>
             <p>Initial Interface Design (Figma)</p>
          </div>
       </td>
       <td width="25%">
          <div align="center">
-            <a href=""><img src="https://i.ibb.co/JK5jTgY/5651475.png" width="100" height="100"></a>
+            <a href="#">
+               <img src="https://i.ibb.co/JK5jTgY/5651475.png" width="55%">
+            </a>
             <p>Video Demo Masterlist</p>
          </div>
       </td>
    </tr>
 </table>
 </div>
+
 
