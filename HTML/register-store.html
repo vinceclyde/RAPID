@@ -43,9 +43,44 @@
     <div id="storeList"></div>
 
     <script>
-        let storeData = [];
+        const apiBaseUrl = 'http://localhost:5000';
 
-        function registerStore() {
+        // Fetch stores from the database and display them
+        async function fetchStores() {
+            try {
+                const response = await fetch(`${apiBaseUrl}/get-stores`);
+                const stores = await response.json();
+
+                if (Array.isArray(stores)) {
+                    displayStores(stores);
+                } else {
+                    console.error("Invalid response format:", stores);
+                }
+            } catch (error) {
+                console.error("Error fetching stores:", error);
+            }
+        }
+
+        // Display stores in the UI
+        function displayStores(stores) {
+            const storeList = document.getElementById("storeList");
+            storeList.innerHTML = ""; // Clear the existing list
+            stores.forEach(store => {
+                const storeInfo = document.createElement("div");
+                storeInfo.innerHTML = `
+                    <strong>${store.name}</strong><br>
+                    Address: ${store.address}<br>
+                    Hours: ${store.hours}<br>
+                    Contact: ${store.contact}<br>
+                    Supply Type: ${store.supplyType}<br>
+                    Supply Status: ${store.supplyStatus}<br><br>
+                `;
+                storeList.appendChild(storeInfo);
+            });
+        }
+
+        // Register a new store
+        async function registerStore() {
             const storeName = document.getElementById("storeName").value;
             const storeAddress = document.getElementById("storeAddress").value;
             const storeHours = document.getElementById("storeHours").value;
@@ -67,38 +102,27 @@
                 supplyStatus: supplyStatus
             };
 
-            // Push the store data to the storeData array
-            storeData.push(store);
-            displayStores();
-            sendToDatabase(store);
+            try {
+                const response = await fetch(`${apiBaseUrl}/register-store`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(store)
+                });
+                const data = await response.json();
+
+                if (data.message) {
+                    alert(data.message);
+                    fetchStores(); // Refresh the store list after registration
+                } else {
+                    console.error("Error registering store:", data);
+                }
+            } catch (error) {
+                console.error("Error registering store:", error);
+            }
         }
 
-        function displayStores() {
-            const storeList = document.getElementById("storeList");
-            storeList.innerHTML = "";  // Clear the existing list
-            storeData.forEach(store => {
-                const storeInfo = document.createElement("div");
-                storeInfo.innerHTML = `<strong>${store.name}</strong><br>Address: ${store.address}<br>Hours: ${store.hours}<br>Contact: ${store.contact}<br>Supply Type: ${store.supplyType}<br>Supply Status: ${store.supplyStatus}<br><br>`;
-                storeList.appendChild(storeInfo);
-            });
-        }
-
-        function sendToDatabase(store) {
-            fetch('http://localhost:5000/register-store', {  // Adjust to your backend URL
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(store)
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log("Store saved successfully", data);
-            })
-            .catch(error => {
-                console.error("Error saving store data", error);
-            });
-        }
+        // Fetch and display stores on page load
+        fetchStores();
     </script>
 </body>
 </html>

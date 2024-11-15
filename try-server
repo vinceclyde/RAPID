@@ -56,7 +56,21 @@ app.post('/register-store', async (req, res) => {
     }
 });
 
+// Endpoint to retrieve all registered stores
+app.get('/get-stores', async (req, res) => {
+    try {
+        const stores = await storesCollection.find().toArray();
+        res.json(stores);
+    } catch (err) {
+        console.error('Error fetching stores:', err);
+        res.status(500).json({ error: 'Error fetching stores' });
+    }
+});
+
+
 // Set up the server to listen on port 5000
 app.listen(5000, () => {
     console.log('Server running on port 5000');
 });
+
+
