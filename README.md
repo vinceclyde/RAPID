@@ -101,7 +101,7 @@
       <div align="left"><strong>💡Vince Clyde S. Banaag</strong><br>
         ➟ Full Stack Developer/Project Manager<br>
         ➟ 22-06373@g.batstate-u.edu.ph<br>
-        🎧 <b>Lahat ng Bukas</b> - Cup of Joe
+        🎧 <b>Star Signs</b> - LE SSERAFIM
       </div>
     </td>
   </tr>
