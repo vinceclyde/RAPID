@@ -30,13 +30,13 @@
 ### <a name="features"></a>
 ## 🙀 Features
 <div align=justify">
-   ⦿ <b>Role-Based Access Control</b>: RAPID provides general access for regular users with limited permissions, allowing them to perform standard tasks within the app. On the other hand, it offers enhanced access for administrators, enabling them to manage content and resources that standard users cannot.<br>
-   ⦿ <b>Dashboard</b><br>
-   ⦿ <b>Map Annotation</b><br>
-   ⦿ <b>GeoTagging</b><br>
-   ⦿ <b>User-Generated Traffic Updates</b><br>
-   ⦿ <b>Resource Oversight</b><br>
-   ⦿ <b>Admin Control</b><br>
+   ⦿ <b>Role-Based Access Control</b>: RAPID provides general access for regular users with limited permissions, allowing them to perform standard tasks within the app. On the other hand, it offers enhanced access for administrators, enabling them to manage content and resources that standard users cannot.<br><br>
+   ⦿ <b>Dashboard</b> - The dashboard provides users with a comprehensive overview of available resources, live updates, and quick links to essential features such as search functions, map views, and personal alerts.<br><br>
+   ⦿ <b>Map Annotation</b> - Users can indicate specific information about resource availability, hazards, or updates on road conditions, helping other users stay informed in real-time.<br><br>
+   ⦿ <b>GeoTagging</b> - RAPID enables users to tag resources and report locations with precise geographical coordinates.<br><br>
+   ⦿ <b>User-Generated Traffic Updates</b> - Users can contribute to real-time traffic data by sending updates via image uploads on road conditions, closures, or areas with heavy congestion. This crowdsourced feature improves route planning and helps users avoid dangerous or impassable areas. <br><br>
+   ⦿ <b>Resource Oversight</b> - This function allows users to monitor the availability and status of essential resources, such as food, water, medical kits, and gasoline, within designated areas. It provides a centralized view of supplies to ensure efficient allocation and quick replenishment.<br><br>
+   ⦿ <b>Admin Control</b> -  Admins have exclusive access to manage resources, review user-generated content, and update critical information on the app. <br>
 </div>
 
 ### <a name="stack"></a>
@@ -110,8 +110,34 @@
      
 ### <a name="links"></a>
 ## 🔗 Important Links
-⦿ <a href=""><span>Project Plan</span></a><br>
-⦿ <a href=""><span>Project Documentation</span></a><br>
-⦿ <a href=""><span>Initial Interface Design (Figma)</span></a><br>
-⦿ <a href=""><span>App Demo Youtube Playlist</span></a>
+<div align="center">
+<table width="100%">
+   <tr>
+      <td width="25%">
+         <div align="center">
+            <a href=""><img src="https://i.ibb.co/zGM2VWL/plan-28-1.png" height="100"></a>
+            <p>Project Plan</p>
+         </div>
+      </td>
+      <td width="25%">
+         <div align="center">
+            <a href=""><img src="https://i.ibb.co/HLyN6mr/9746449.png" width="100" height="100"></a>
+            <p>Project Documentation</p>
+         </div>
+      </td>
+      <td width="25%">
+         <div align="center">
+            <a href=""><img src="https://i.ibb.co/ZJKs3pm/4595100.png" width="100" height="100"></a>
+            <p>Initial Interface Design (Figma)</p>
+         </div>
+      </td>
+      <td width="25%">
+         <div align="center">
+            <a href=""><img src="https://i.ibb.co/JK5jTgY/5651475.png" width="100" height="100"></a>
+            <p>Video Demo Masterlist</p>
+         </div>
+      </td>
+   </tr>
+</table>
+</div>
 
