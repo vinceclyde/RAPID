@@ -68,7 +68,7 @@
 
 ### <a name="members"></a>
 ## :shipit: Member Portfolio
-<div align="center">
+<div align="center" overflow-x: auto;>
 <table style="width: 100%; table-layout: fixed;">
   <tr>
     <th style="width: 120px;">
@@ -111,7 +111,7 @@
      
 ### <a name="links"></a>
 ## 🔗 Important Links
-<div align="center">
+<div align="center" overflow-x: auto;>
 <table width="100%">
    <tr>
       <td width="25%">
