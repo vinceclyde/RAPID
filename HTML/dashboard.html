@@ -78,6 +78,87 @@
                 setActiveNavItem(document.getElementById("dashboard"));
             });
         });
+
+        const apiBaseUrl = 'http://localhost:5000';
+
+// Fetch stores from the database and display them
+async function fetchStores() {
+    try {
+        const response = await fetch(`${apiBaseUrl}/get-stores`);
+        const stores = await response.json();
+
+        if (Array.isArray(stores)) {
+            displayStores(stores);
+        } else {
+            console.error("Invalid response format:", stores);
+        }
+    } catch (error) {
+        console.error("Error fetching stores:", error);
+    }
+}
+
+// Display stores in the UI
+function displayStores(stores) {
+    const storeList = document.getElementById("storeList");
+    storeList.innerHTML = ""; // Clear the existing list
+    stores.forEach(store => {
+        const storeInfo = document.createElement("div");
+        storeInfo.innerHTML = `
+            <strong>${store.name}</strong><br>
+            Address: ${store.address}<br>
+            Hours: ${store.hours}<br>
+            Contact: ${store.contact}<br>
+            Supply Type: ${store.supplyType}<br>
+            Supply Status: ${store.supplyStatus}<br><br>
+        `;
+        storeList.appendChild(storeInfo);
+    });
+}
+
+// Register a new store
+async function registerStore() {
+    const storeName = document.getElementById("storeName").value;
+    const storeAddress = document.getElementById("storeAddress").value;
+    const storeHours = document.getElementById("storeHours").value;
+    const contactNumber = document.getElementById("contactNumber").value;
+    const supplyType = document.querySelector('input[name="supplyType"]:checked') ? document.querySelector('input[name="supplyType"]:checked').value : "";
+    const supplyStatus = document.querySelector('input[name="supplyStatus"]:checked') ? document.querySelector('input[name="supplyStatus"]:checked').value : "";
+
+    if (!storeName || !storeAddress || !storeHours || !contactNumber || !supplyType || !supplyStatus) {
+        alert("Please fill out all fields.");
+        return;
+    }
+
+    const store = {
+        name: storeName,
+        address: storeAddress,
+        hours: storeHours,
+        contact: contactNumber,
+        supplyType: supplyType,
+        supplyStatus: supplyStatus
+    };
+
+    try {
+        const response = await fetch(`${apiBaseUrl}/register-store`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(store)
+        });
+        const data = await response.json();
+
+        if (data.message) {
+            alert(data.message);
+            fetchStores(); // Refresh the store list after registration
+        } else {
+            console.error("Error registering store:", data);
+        }
+    } catch (error) {
+        console.error("Error registering store:", error);
+    }
+}
+
+// Fetch and display stores on page load
+fetchStores();
     </script>
 </body>
 </html>
