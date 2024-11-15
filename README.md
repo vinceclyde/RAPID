@@ -73,7 +73,7 @@
 <table style="width: 100%; table-layout: auto; border-spacing: 10px;">
   <tr>
     <th style="width: 80px; text-align: center;">
-      <img src="https://i.ibb.co/4ftLLzz/400157860-725047402815272-7964848878070784083-n-removebg-preview.png" width="40%">
+      <img src="https://i.ibb.co/4ftLLzz/400157860-725047402815272-7964848878070784083-n-removebg-preview.png" width="45%">
     </th>
     <td>
       <div align="left"><strong>💡Eljay P. Marasigan</strong><br>
