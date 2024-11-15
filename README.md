@@ -68,11 +68,12 @@
 
 ### <a name="members"></a>
 ## :shipit: Member Portfolio
+
 <div align="center" style="overflow-x: auto;">
-<table style="width: 100%; table-layout: fixed;">
+<table style="width: 100%; table-layout: auto; border-spacing: 10px;">
   <tr>
-    <th style="width: 120px;">
-      <img src="https://i.ibb.co/4ftLLzz/400157860-725047402815272-7964848878070784083-n-removebg-preview.png" width="100" height="100"/>
+    <th style="width: 120px; text-align: center;">
+      <img src="https://i.ibb.co/4ftLLzz/400157860-725047402815272-7964848878070784083-n-removebg-preview.png" style="max-width: 100px; height: auto;"/>
     </th>
     <td>
       <div align="left"><strong>💡Eljay P. Marasigan</strong><br>
@@ -83,8 +84,8 @@
     </td>
   </tr>
   <tr>
-    <th style="width: 120px;">
-      <img src="https://i.ibb.co/QDSJRky/116318209-removebg-preview.png" width="100" height="100"/>
+    <th style="width: 120px; text-align: center;">
+      <img src="https://i.ibb.co/QDSJRky/116318209-removebg-preview.png" style="max-width: 100px; height: auto;"/>
     </th>
     <td>
       <div align="left"><strong>💡Iemerie Jom C. Manguit</strong><br>
@@ -95,8 +96,8 @@
     </td>
   </tr>
   <tr>
-    <th style="width: 120px;">
-      <img src="https://i.ibb.co/MZMmvPN/Passport-Picture-1-removebg-preview.png" width="95" height="100"/>
+    <th style="width: 120px; text-align: center;">
+      <img src="https://i.ibb.co/MZMmvPN/Passport-Picture-1-removebg-preview.png" style="max-width: 95px; height: auto;"/>
     </th>
     <td>
       <div align="left"><strong>💡Vince Clyde S. Banaag</strong><br>
@@ -108,6 +109,7 @@
   </tr>
 </table>
 </div>
+
      
 ### <a name="links"></a>
 ## 🔗 Important Links
