@@ -70,7 +70,7 @@
 ## :shipit: Member Portfolio
 
 <div align="center">
-<table style="width: 100%; table-layout: auto; border-spacing: 10px;">
+<table style="width: 100%; table-layout: auto;">
   <tr>
     <th style="width: 80px; text-align: center;">
       <img src="https://i.ibb.co/4ftLLzz/400157860-725047402815272-7964848878070784083-n-removebg-preview.png" width="55%">
