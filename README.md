@@ -44,6 +44,7 @@
 <h3><b>Frontend Development</b></h3>
 ⦿ <b>HTML</b><br>
 ⦿ <b>CSS</b><br>
+⦿ <b>JavaScript</b>
 <h3><b>Data Storage and Management</b></h3>
 ⦿ <b>MongoDB Cloud</b> - used to store user and store information.<br>
 ⦿ <b>Supabase</b> - used to store unstructured data, particulary image files.<br>
@@ -67,37 +68,43 @@
 ### <a name="members"></a>
 ## :shipit: Member Portfolio
 <div align="center">
-<table>
+<table style="width: 100%; table-layout: fixed;">
   <tr>
-        <th><img src="https://i.ibb.co/4ftLLzz/400157860-725047402815272-7964848878070784083-n-removebg-preview.png" width="100" height="100"/></th>
-        <td>
-            <div align="left"><strong>💡Eljay P. Marasigan</strong><br>
-                ➟ Leader/Frontend Developer<br>
-                ➟ 22-05538@g.batstate-u.edu.ph<br>
-               🎧 <b>BMW</b> - Because ft. Leslie
-            </div>
-        </td>
-   <tr>
-   <tr>
-        <th><img src="https://i.ibb.co/4ftLLzz/400157860-725047402815272-7964848878070784083-n-removebg-preview.png" width="100" height="100"/></th>
-        <td>
-            <div align="left"><strong>💡Iemerie Jom C. Manguit</strong><br>
-                ➟ Backend Developer<br>
-                ➟ 22-09658@g.batstate-u.edu.ph<br>
-               🎧 <b>Labyrinth</b> - Taylor Swift
-            </div>
-        </td>
-   <tr>
-    <tr>
-        <th><img src="https://i.ibb.co/4ftLLzz/400157860-725047402815272-7964848878070784083-n-removebg-preview.png" width="100" height="100"/></th>
-        <td>
-            <div align="left"><strong>💡Vince Clyde S. Banaag</strong><br>
-                ➟ Full Stack Developer/Project Manager<br>
-                ➟ 22-06373@g.batstate-u.edu.ph<br>
-               🎧 <b>Lahat ng Bukas</b> - Cup of Joe
-            </div>
-        </td>
-   <tr>
+    <th style="width: 120px;">
+      <img src="https://i.ibb.co/4ftLLzz/400157860-725047402815272-7964848878070784083-n-removebg-preview.png" width="100" height="100"/>
+    </th>
+    <td>
+      <div align="left"><strong>💡Eljay P. Marasigan</strong><br>
+        ➟ Leader/Frontend Developer<br>
+        ➟ 22-05538@g.batstate-u.edu.ph<br>
+        🎧 <b>BMW</b> - Because ft. Leslie
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <th style="width: 120px;">
+      <img src="https://i.ibb.co/4ftLLzz/400157860-725047402815272-7964848878070784083-n-removebg-preview.png" width="100" height="100"/>
+    </th>
+    <td>
+      <div align="left"><strong>💡Iemerie Jom C. Manguit</strong><br>
+        ➟ Backend Developer<br>
+        ➟ 22-09658@g.batstate-u.edu.ph<br>
+        🎧 <b>Labyrinth</b> - Taylor Swift
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <th style="width: 120px;">
+      <img src="https://i.ibb.co/4ftLLzz/400157860-725047402815272-7964848878070784083-n-removebg-preview.png" width="100" height="100"/>
+    </th>
+    <td>
+      <div align="left"><strong>💡Vince Clyde S. Banaag</strong><br>
+        ➟ Full Stack Developer/Project Manager<br>
+        ➟ 22-06373@g.batstate-u.edu.ph<br>
+        🎧 <b>Lahat ng Bukas</b> - Cup of Joe
+      </div>
+    </td>
+  </tr>
 </table>
 </div>
      
