@@ -30,7 +30,7 @@
 
 ### <a name="features"></a>
 ## 🙀 Features
-<div align=justify">
+<div align="justify">
    ⦿ <b>Role-Based Access Control</b>: RAPID provides general access for regular users with limited permissions, allowing them to perform standard tasks within the app. On the other hand, it offers enhanced access for administrators, enabling them to manage content and resources that standard users cannot.<br><br>
    ⦿ <b>Dashboard</b> - The dashboard provides users with a comprehensive overview of available resources, live updates, and quick links to essential features such as search functions, map views, and personal alerts.<br><br>
    ⦿ <b>Map Annotation</b> - Users can indicate specific information about resource availability, hazards, or updates on road conditions, helping other users stay informed in real-time.<br><br>
@@ -42,6 +42,7 @@
 
 ### <a name="stack"></a>
 ## 🤖 Tech Stack
+<div align="justify>
 <h3><b>Frontend Development</b></h3>
 ⦿ <b>HTML</b> - forms the structure of the RAPID webpage.<br>
 ⦿ <b>CSS</b> - controls RAPID's visual design and responsiveness, thus making the pages aesthetically pleasing and adaptable to different screen sizes.<br>
@@ -60,8 +61,13 @@
 ⦿ <b>body-parse</b> - Middleware for parsing JSON request bodies <br>
 ⦿ <b>mongodb</b> - MongoDB client to connect and interact with MongoDB database.<br><br>
 <pre><code>npm install express cors bcryptjs body-parser mongodb</code></pre>
-
-
+<h3><b>APIs</b></h3>
+⦿ <b>OpenStreetMap</b> - a map tile source providing free geographic data and map visuals.<br>
+⦿ <b>Nominatim Geocoding API</b> - converts text-based location data into geographic coordinates and vice versa.
+<h3><b>Libraries/Plugins</b></h3>
+⦿ <b>Leaflet</b> - provides tools to initialize and manipulate maps, markers, and layers.<br>
+⦿ <b>Leaflet Routing Machine</b> - adds routing and waypoint features to Leaflet
+</div>
 
 ### <a name="preview"></a>
 ## 🫣 Preview
