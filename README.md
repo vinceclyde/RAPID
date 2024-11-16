@@ -42,7 +42,7 @@
 
 ### <a name="stack"></a>
 ## 🤖 Tech Stack
-<div align="justify>
+<div align="justify">
 <h3><b>Frontend Development</b></h3>
 ⦿ <b>HTML</b> - forms the structure of the RAPID webpage.<br>
 ⦿ <b>CSS</b> - controls RAPID's visual design and responsiveness, thus making the pages aesthetically pleasing and adaptable to different screen sizes.<br>
