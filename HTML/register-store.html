@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Store Registration</title>
     <link rel="stylesheet" href="styles/dashboard.css">
+
 </head>
 <body>
     <div class="container">
@@ -16,6 +17,7 @@
 
         <label class="label" for="storeAddress">Address</label>
         <input class="input" type="text" id="storeAddress" required><br>
+        <ul id="suggestions"></ul>
 
         <div class="regStoreSubCon">
             <div class="field">
@@ -50,9 +52,22 @@
     </form>
 </div>
 <div class="regStoreCon2">
-    <div class="mapContainerSmall"></div>
+    <div class="mapContainerSmall" id="map" style="height: 400px; width: 100%; margin-bottom: 15px;"></div>
     <p class="label">Your Registered Store</p>
-    <div class="storeContainer"></div>
+    <div class="storeContainer" id="storeList"></div>
+    <div class="centerDiv">
+        <button type="button" onclick="deleteStore()">DELETE</button>
+        <button type="button" onclick="prepareUpdate()">UPDATE</button>
+    </div>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""/>
+     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+    <script src="../map.js"></script>
+
 </div>
 </div>
 <script>
@@ -81,58 +96,140 @@ function displayStores(stores) {
     stores.forEach(store => {
         const storeInfo = document.createElement("div");
         storeInfo.innerHTML = `
-            <strong>${store.name}</strong><br>
-            Address: ${store.address}<br>
-            Hours: ${store.hours}<br>
-            Contact: ${store.contact}<br>
-            Supply Type: ${store.supplyType}<br>
-            Supply Status: ${store.supplyStatus}<br><br>
+                    <input type="radio" name="selectedStore" value="${store._id}" id="store-${store._id}">
+                    <label for="store-${store._id}">
+                <strong>${store.name}</strong><br>
+                Address: ${store.address}<br>
+                Hours: ${store.hours}<br>
+                Contact: ${store.contact}<br>
+                Supply Type: ${store.supplyType}<br>
+                Supply Status: ${store.supplyStatus}<br>
+                    </label>
+                    <hr>
         `;
         storeList.appendChild(storeInfo);
     });
 }
 
-// Register a new store
-async function registerStore() {
-    const storeName = document.getElementById("storeName").value;
-    const storeAddress = document.getElementById("storeAddress").value;
-    const storeHours = document.getElementById("storeHours").value;
-    const contactNumber = document.getElementById("contactNumber").value;
-    const supplyType = document.querySelector('input[name="supplyType"]:checked') ? document.querySelector('input[name="supplyType"]:checked').value : "";
-    const supplyStatus = document.querySelector('input[name="supplyStatus"]:checked') ? document.querySelector('input[name="supplyStatus"]:checked').value : "";
+        function prepareUpdate() {
+            const selectedStoreId = document.querySelector('input[name="selectedStore"]:checked')?.value;
+            console.log("Selected Store ID for Update:", selectedStoreId); // Debug log
+
+            if (!selectedStoreId) {
+                alert("Please select a store to update.");
+                return;
+            }
+
+            // Fetch the store's details from the database
+            fetch(`${apiBaseUrl}/get-store/${selectedStoreId}`)
+                .then(response => response.json())
+                .then(store => {
+                    console.log("Store Details for Update:", store); // Debug log
+
+                    document.getElementById("storeName").value = store.name;
+                    document.getElementById("storeAddress").value = store.address;
+                    document.getElementById("storeHours").value = store.hours;
+                    document.getElementById("contactNumber").value = store.contact;
+
+                    // Set the supply type radio button
+                    document.querySelector(`input[name="supplyType"][value="${store.supplyType}"]`).checked = true;
+
+                    // Set the supply status radio button
+                    document.querySelector(`input[name="supplyStatus"][value="${store.supplyStatus}"]`).checked = true;
+
+                    // Store the selected store ID in a hidden field or variable
+                    window.selectedStoreId = store._id;
+                })
+                .catch(error => {
+                    console.error("Error fetching store details:", error);
+                });
+        }
+
+
+        // Register a new store
+        async function registerStore() {
+            console.log("Current Selected Store ID (for update):", window.selectedStoreId); // Debug log
+
+            const storeName = document.getElementById("storeName").value;
+            const storeAddress = document.getElementById("storeAddress").value;
+            const storeHours = document.getElementById("storeHours").value;
+            const contactNumber = document.getElementById("contactNumber").value;
+            const supplyType = document.querySelector('input[name="supplyType"]:checked')?.value || "";
+            const supplyStatus = document.querySelector('input[name="supplyStatus"]:checked')?.value || "";
 
     if (!storeName || !storeAddress || !storeHours || !contactNumber || !supplyType || !supplyStatus) {
         alert("Please fill out all fields.");
         return;
     }
 
-    const store = {
-        name: storeName,
-        address: storeAddress,
-        hours: storeHours,
-        contact: contactNumber,
-        supplyType: supplyType,
-        supplyStatus: supplyStatus
-    };
+            const store = { name: storeName, address: storeAddress, hours: storeHours, contact: contactNumber, supplyType, supplyStatus };
 
-    try {
-        const response = await fetch(`${apiBaseUrl}/register-store`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(store)
-        });
-        const data = await response.json();
+            try {
+                if (window.selectedStoreId) {
+                    // Update the store
+                    const response = await fetch(`${apiBaseUrl}/update-store/${window.selectedStoreId}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(store),
+                    });
+                    const data = await response.json();
+                    console.log("Update Response:", data); // Debug log
+
+                    if (data.message) {
+                        alert(data.message);
+                        window.selectedStoreId = null; // Reset selected store ID
+                        fetchStores(); // Refresh the store list
+                    } else {
+                        console.error("Error updating store:", data);
+                    }
+                } else {
+                    // Register a new store
+                    const response = await fetch(`${apiBaseUrl}/register-store`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(store),
+                    });
+                    const data = await response.json();
+
+                    if (data.message) {
+                        alert(data.message);
+                        fetchStores(); // Refresh the store list
+                    } else {
+                        console.error("Error registering store:", data);
+                    }
+                }
+            } catch (error) {
+                console.error("Error during store registration/update:", error);
+            }
+        }
+
+        async function deleteStore() {
+            const selectedStoreId = document.querySelector('input[name="selectedStore"]:checked')?.value;
+            console.log("Selected Store ID for Deletion:", selectedStoreId); // Debug log
+
+            if (!selectedStoreId) {
+                alert("Please select a store to delete.");
+                return;
+            }
+
+            try {
+                const response = await fetch(`${apiBaseUrl}/delete-store/${selectedStoreId}`, {
+                    method: "DELETE",
+                });
+                const data = await response.json();
+                console.log("Delete Response:", data); // Debug log
 
         if (data.message) {
             alert(data.message);
-            fetchStores(); // Refresh the store list after registration
+            fetchStores(); // Refresh the store list
         } else {
-            console.error("Error registering store:", data);
+            console.error("Error deleting store:", data);
         }
     } catch (error) {
-        console.error("Error registering store:", error);
+        console.error("Error deleting store:", error);
     }
 }
+
 
 // Fetch and display stores on page load
 fetchStores();

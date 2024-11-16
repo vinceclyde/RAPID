@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const { MongoClient } = require('mongodb');
+const { ObjectId } = require('mongodb');
+
 
 const app = express();
 
@@ -86,9 +88,10 @@ app.put('/update-store/:id', async (req, res) => {
         const updatedStore = { name, address, hours, contact, supplyType, supplyStatus };
 
         const result = await storesCollection.updateOne(
-            { _id: new MongoClient.ObjectId(id) },
+            { _id: new ObjectId(id) },
             { $set: updatedStore }
         );
+
 
         if (result.modifiedCount > 0) {
             res.json({ message: 'Store updated successfully' });
@@ -104,13 +107,17 @@ app.put('/update-store/:id', async (req, res) => {
 // Endpoint to delete a store
 app.delete('/delete-store/:id', async (req, res) => {
     const { id } = req.params;
+    console.log("Deleting store with ID:", id); // Log the received ID
 
     try {
-        const result = await storesCollection.deleteOne({ _id: new MongoClient.ObjectId(id) });
+        // Use ObjectId properly here
+        const deleteResult = await storesCollection.deleteOne({ _id: new ObjectId(id) });
 
-        if (result.deletedCount > 0) {
+        if (deleteResult.deletedCount > 0) {
+            console.log("Store deleted successfully");
             res.json({ message: 'Store deleted successfully' });
         } else {
+            console.error("Store not found");
             res.status(404).json({ error: 'Store not found' });
         }
     } catch (err) {
@@ -118,6 +125,24 @@ app.delete('/delete-store/:id', async (req, res) => {
         res.status(500).json({ error: 'Error deleting store' });
     }
 });
+
+// Get details of a specific store by ID
+app.get('/get-store/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const store = await storesCollection.findOne({ _id: new ObjectId(id) });
+        if (store) {
+            res.json(store);
+        } else {
+            res.status(404).json({ error: "Store not found" });
+        }
+    } catch (error) {
+        console.error("Error fetching store:", error);
+        res.status(500).json({ error: "Error fetching store" });
+    }
+});
+
 
 
 
