@@ -17,6 +17,7 @@
 
         <label class="label" for="storeAddress">Address</label>
         <input class="input" type="text" id="storeAddress" required><br>
+        <ul id="suggestions"></ul>
 
         <div class="regStoreSubCon">
             <div class="field">
@@ -51,9 +52,9 @@
     </form>
 </div>
 <div class="regStoreCon2">
-    <div class="mapContainer"></div>
+    <div class="mapContainer" id="map" style="height: 400px; width: 100%; margin-bottom: 15px;"></div>
     <p class="label">Your Registered Store</p>
-    <div class="storeContainer"></div>
+    <div class="storeContainer" id="storeList"></div>
     <div class="centerDiv">
         <button type="button" onclick="deleteStore()">DELETE</button>
         <button type="button" onclick="prepareUpdate()">UPDATE</button>
