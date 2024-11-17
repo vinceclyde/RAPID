@@ -2,7 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
+const jwt = require('jsonwebtoken');
+const authenticate = require('./middleware/auth'); // Import the authentication middleware
 
 const app = express();
 
@@ -18,41 +20,91 @@ const client = new MongoClient(uri, {
     useUnifiedTopology: true,
 });
 
-let usersCollection; // This will hold the reference to the users collection
+let usersCollection;
+let storesCollection;
 
 // Connect to MongoDB
 client.connect()
     .then(() => {
-        usersCollection = client.db('RAPID').collection('users'); // Use 'users' as the collection name
+        usersCollection = client.db('RAPID').collection('users'); // 'users' collection
+        storesCollection = client.db('RAPID').collection('stores'); // 'stores' collection
         console.log('Connected to MongoDB');
     })
     .catch((err) => {
         console.error('Error connecting to MongoDB:', err);
     });
 
+// Secret key for JWT
+const secretKey = 'yourSecretKey';
+
+// Utility function to convert an ID to ObjectId
+function convertToObjectId(id) {
+    if (!ObjectId.isValid(id)) {
+        throw new Error('Invalid ObjectId');
+    }
+    return new ObjectId(id);
+}
+
+// Utility function to process store data
+async function processStore(storeData, userId) {
+    const { name, address, hours, contact, supplyType, supplyStatus } = storeData;
+    return {
+        name,
+        address,
+        hours,
+        contact,
+        supplyType,
+        supplyStatus,
+        userId
+    };
+}
+
+// Public route to fetch supplies (no authentication needed)
+// Public route to fetch supplies (authentication required but returns all supplies)
+app.get('/get-supplies', authenticate, async (req, res) => {
+    console.log("Fetching supplies...");
+    try {
+        const supplies = await storesCollection.aggregate([
+            {
+                $group: {
+                    _id: "$supplyType", // Group by supplyType
+                    supplies: {
+                        $push: {
+                            address: "$address",      // Push the address of the store
+                            supplyStatus: "$supplyStatus" // Push the supply status
+                        }
+                    }
+                }
+            }
+        ]).toArray();
+        
+
+        console.log("Supplies fetched:", supplies); // Debugging line
+        res.json(supplies); // Return the supplies data
+    } catch (err) {
+        console.error("Error fetching supplies:", err); // Debugging line
+        res.status(500).json({ error: 'Error fetching supplies' });
+    }
+});
+
+
 // Sign-up endpoint
 app.post('/register', async (req, res) => {
     const { name, email, password } = req.body;
 
     try {
-        // Validate password strength (simple example, adjust as needed)
         if (password.length < 6) {
             return res.status(400).json({ error: 'Password must be at least 6 characters long' });
         }
 
-        // Check if the user already exists
         const userExists = await usersCollection.findOne({ email });
         if (userExists) {
             return res.status(400).json({ error: 'User already exists' });
         }
 
-        // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create the new user
         const newUser = { name, email, password: hashedPassword };
-
-        // Insert the user into the database
         const result = await usersCollection.insertOne(newUser);
 
         if (result.acknowledged) {
@@ -66,32 +118,122 @@ app.post('/register', async (req, res) => {
     }
 });
 
-// Sign-in endpoint
+// Login endpoint
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        // Find user by email
         const user = await usersCollection.findOne({ email });
         if (!user) {
             return res.status(400).json({ error: 'Invalid email or password' });
         }
 
-        // Compare the provided password with the stored hashed password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(400).json({ error: 'Invalid email or password' });
         }
 
-        // Success message (you may want to add a token or session here)
-        res.json({ message: 'Logged in successfully' });
+        const token = jwt.sign({ _id: user._id }, secretKey, { expiresIn: '1h' });
+        res.json({ message: 'Logged in successfully', token });
     } catch (err) {
-        console.error('Error during login:', err);
         res.status(500).json({ error: 'Error logging in' });
     }
 });
 
-// Set up the server to listen on port 5000
+// Middleware to authenticate the user (verify JWT token)
+// Apply authenticate middleware only to routes that need authentication
+// app.use(authenticate); // Do not use this globally, only on protected routes
+
+// Register Store endpoint (requires authentication)
+app.post('/register-store', authenticate, async (req, res) => {
+    try {
+        const newStore = await processStore(req.body, req.user._id);
+        const result = await storesCollection.insertOne(newStore);
+        if (result.acknowledged) {
+            res.json({ message: 'Store registered successfully' });
+        } else {
+            res.status(500).json({ error: 'Error registering store' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: 'Error registering store' });
+    }
+});
+
+// Fetch stores for the authenticated user (requires authentication)
+app.get('/get-stores', authenticate, async (req, res) => {
+    try {
+        const stores = await storesCollection.find({ userId: req.user._id }).toArray();
+        res.json(stores || []); // Return an empty array if no stores are found
+    } catch (err) {
+        res.status(500).json({ error: 'Error fetching stores' });
+    }
+});
+
+// Get store details by ID (requires authentication)
+app.get('/get-store/:id', authenticate, async (req, res) => {
+    const { id } = req.params;
+    console.log("Fetching store with ID:", id);
+
+    try {
+        const objectId = convertToObjectId(id); // Convert id to ObjectId
+        const store = await storesCollection.findOne({ _id: objectId, userId: req.user._id });
+
+        if (store) {
+            res.json(store); // Send store data
+        } else {
+            console.log("Store not found or unauthorized access:", id);
+            res.status(404).json({ error: 'Store not found or not authorized' });
+        }
+    } catch (err) {
+        console.error("Error in /get-store:", err);
+        res.status(500).json({ error: 'Error fetching store' });
+    }
+});
+
+// Update store endpoint (requires authentication)
+app.put('/update-store/:id', authenticate, async (req, res) => {
+    const { id } = req.params;
+    try {
+        const objectId = convertToObjectId(id); // Convert id to ObjectId
+        const updatedStore = await processStore(req.body, req.user._id);
+
+        const result = await storesCollection.updateOne(
+            { _id: objectId, userId: req.user._id }, // Ensure only the store owner can update
+            { $set: updatedStore }
+        );
+
+        if (result.modifiedCount > 0) {
+            res.json({ message: 'Store updated successfully' });
+        } else {
+            res.status(400).json({ error: 'Store not found or you are not authorized to update it' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: 'Error updating store' });
+    }
+});
+
+// Delete store endpoint (requires authentication)
+app.delete('/delete-store/:id', authenticate, async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const objectId = convertToObjectId(id); // Convert id to ObjectId
+
+        const result = await storesCollection.deleteOne(
+            { _id: objectId, userId: req.user._id } // Ensure only the store owner can delete
+        );
+
+        if (result.deletedCount > 0) {
+            res.json({ message: 'Store deleted successfully' });
+        } else {
+            res.status(400).json({ error: 'Store not found or you are not authorized to delete it' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: 'Error deleting store' });
+    }
+});
+
+// Start the server
 app.listen(5000, () => {
     console.log('Server running on port 5000');
 });

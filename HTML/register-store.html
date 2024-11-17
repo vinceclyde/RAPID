@@ -33,17 +33,17 @@
         <div class="regStoreSubCon">
         <fieldset class="supply">
             <legend>Supply Type:</legend>
-            <label><input type="radio" name="supplyType" value="water"> Water</label><br>
-            <label><input type="radio" name="supplyType" value="medical"> Medical</label><br>
-            <label><input type="radio" name="supplyType" value="food"> Food</label><br>
-            <label><input type="radio" name="supplyType" value="gas"> Gas</label><br>
+            <label><input type="radio" name="supplyType" value="Water"> Water</label><br>
+            <label><input type="radio" name="supplyType" value="Medical"> Medical</label><br>
+            <label><input type="radio" name="supplyType" value="Food"> Food</label><br>
+            <label><input type="radio" name="supplyType" value="Gas"> Gas</label><br>
         </fieldset>
 
         <fieldset class="supply">
             <legend>Supply Status:</legend>
-            <label><input type="radio" name="supplyStatus" value="available"> Available</label><br>
-            <label><input type="radio" name="supplyStatus" value="limited"> Limited</label><br>
-            <label><input type="radio" name="supplyStatus" value="outOfStock"> Out of Stock</label><br>
+            <label><input type="radio" name="supplyStatus" value="Available"> Available</label><br>
+            <label><input type="radio" name="supplyStatus" value="Limited"> Limited</label><br>
+            <label><input type="radio" name="supplyStatus" value="Out Of Stock"> Out of Stock</label><br>
         </fieldset><br>
         </div>
         <div class="centerDiv">
@@ -55,9 +55,10 @@
     <div class="mapContainerSmall" id="map" style="height: 400px; width: 100%; margin-bottom: 15px;"></div>
     <p class="label">Your Registered Store</p>
     <div class="storeContainer" id="storeList"></div>
-    <div class="centerDiv">
-        <button type="button" onclick="deleteStore()">DELETE</button>
-        <button type="button" onclick="prepareUpdate()">UPDATE</button>
+    <div class="centerDiv2">
+        <button class="submitButton" type="button" onclick="deleteStore()">DELETE</button>
+        <button class="submitButton" type="button" onclick="prepareUpdate()">EDIT</button>
+        <button class="submitButton" type="button" onclick="updateStore()">UPDATE</button>
     </div>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -70,169 +71,7 @@
 
 </div>
 </div>
-<script>
-    const apiBaseUrl = 'http://localhost:5000';
-
-// Fetch stores from the database and display them
-async function fetchStores() {
-    try {
-        const response = await fetch(`${apiBaseUrl}/get-stores`);
-        const stores = await response.json();
-
-        if (Array.isArray(stores)) {
-            displayStores(stores);
-        } else {
-            console.error("Invalid response format:", stores);
-        }
-    } catch (error) {
-        console.error("Error fetching stores:", error);
-    }
-}
-
-// Display stores in the UI
-function displayStores(stores) {
-    const storeList = document.getElementById("storeList");
-    storeList.innerHTML = ""; // Clear the existing list
-    stores.forEach(store => {
-        const storeInfo = document.createElement("div");
-        storeInfo.innerHTML = `
-                    <input type="radio" name="selectedStore" value="${store._id}" id="store-${store._id}">
-                    <label for="store-${store._id}">
-                <strong>${store.name}</strong><br>
-                Address: ${store.address}<br>
-                Hours: ${store.hours}<br>
-                Contact: ${store.contact}<br>
-                Supply Type: ${store.supplyType}<br>
-                Supply Status: ${store.supplyStatus}<br>
-                    </label>
-                    <hr>
-        `;
-        storeList.appendChild(storeInfo);
-    });
-}
-
-        function prepareUpdate() {
-            const selectedStoreId = document.querySelector('input[name="selectedStore"]:checked')?.value;
-            console.log("Selected Store ID for Update:", selectedStoreId); // Debug log
-
-            if (!selectedStoreId) {
-                alert("Please select a store to update.");
-                return;
-            }
-
-            // Fetch the store's details from the database
-            fetch(`${apiBaseUrl}/get-store/${selectedStoreId}`)
-                .then(response => response.json())
-                .then(store => {
-                    console.log("Store Details for Update:", store); // Debug log
-
-                    document.getElementById("storeName").value = store.name;
-                    document.getElementById("storeAddress").value = store.address;
-                    document.getElementById("storeHours").value = store.hours;
-                    document.getElementById("contactNumber").value = store.contact;
-
-                    // Set the supply type radio button
-                    document.querySelector(`input[name="supplyType"][value="${store.supplyType}"]`).checked = true;
-
-                    // Set the supply status radio button
-                    document.querySelector(`input[name="supplyStatus"][value="${store.supplyStatus}"]`).checked = true;
-
-                    // Store the selected store ID in a hidden field or variable
-                    window.selectedStoreId = store._id;
-                })
-                .catch(error => {
-                    console.error("Error fetching store details:", error);
-                });
-        }
-
-
-        // Register a new store
-        async function registerStore() {
-            console.log("Current Selected Store ID (for update):", window.selectedStoreId); // Debug log
-
-            const storeName = document.getElementById("storeName").value;
-            const storeAddress = document.getElementById("storeAddress").value;
-            const storeHours = document.getElementById("storeHours").value;
-            const contactNumber = document.getElementById("contactNumber").value;
-            const supplyType = document.querySelector('input[name="supplyType"]:checked')?.value || "";
-            const supplyStatus = document.querySelector('input[name="supplyStatus"]:checked')?.value || "";
-
-    if (!storeName || !storeAddress || !storeHours || !contactNumber || !supplyType || !supplyStatus) {
-        alert("Please fill out all fields.");
-        return;
-    }
-
-            const store = { name: storeName, address: storeAddress, hours: storeHours, contact: contactNumber, supplyType, supplyStatus };
-
-            try {
-                if (window.selectedStoreId) {
-                    // Update the store
-                    const response = await fetch(`${apiBaseUrl}/update-store/${window.selectedStoreId}`, {
-                        method: "PUT",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(store),
-                    });
-                    const data = await response.json();
-                    console.log("Update Response:", data); // Debug log
-
-                    if (data.message) {
-                        alert(data.message);
-                        window.selectedStoreId = null; // Reset selected store ID
-                        fetchStores(); // Refresh the store list
-                    } else {
-                        console.error("Error updating store:", data);
-                    }
-                } else {
-                    // Register a new store
-                    const response = await fetch(`${apiBaseUrl}/register-store`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(store),
-                    });
-                    const data = await response.json();
-
-                    if (data.message) {
-                        alert(data.message);
-                        fetchStores(); // Refresh the store list
-                    } else {
-                        console.error("Error registering store:", data);
-                    }
-                }
-            } catch (error) {
-                console.error("Error during store registration/update:", error);
-            }
-        }
-
-        async function deleteStore() {
-            const selectedStoreId = document.querySelector('input[name="selectedStore"]:checked')?.value;
-            console.log("Selected Store ID for Deletion:", selectedStoreId); // Debug log
-
-            if (!selectedStoreId) {
-                alert("Please select a store to delete.");
-                return;
-            }
-
-            try {
-                const response = await fetch(`${apiBaseUrl}/delete-store/${selectedStoreId}`, {
-                    method: "DELETE",
-                });
-                const data = await response.json();
-                console.log("Delete Response:", data); // Debug log
-
-        if (data.message) {
-            alert(data.message);
-            fetchStores(); // Refresh the store list
-        } else {
-            console.error("Error deleting store:", data);
-        }
-    } catch (error) {
-        console.error("Error deleting store:", error);
-    }
-}
-
-
-// Fetch and display stores on page load
-fetchStores();
-</script>
+<script src="../dashboard.js"></script>
+<script></script>
 </body>
 </html>

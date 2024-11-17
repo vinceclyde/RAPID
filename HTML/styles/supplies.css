@@ -1,0 +1,121 @@
+
+body {
+    background-color: #d6ffff;
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    align-items: center;
+    margin: 0;
+}
+
+.container {
+    animation: fadeIn 1s ease-out 0.5s forwards;
+    background-color: #d6ffff;
+}
+
+#supplies-list {
+    justify-content: center;
+    width: 60%;
+    margin: 20px;
+    background-color: #d6ffff;
+    font-family: 'Inter';
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;  /* Allows wrapping if there are too many supply containers */
+    gap: 20px; /* Adds space between the supply containers */
+    max-height: 80vh; /* Optional: set a max height to control how tall the container can be */
+}
+
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.supply-container {
+    font-size: 8px;
+    background-color: white;
+    text-align: center;
+    width: 40%; /* Adjust this value to control how many columns you want */
+    border: 1px solid black;
+    border-radius: 15px;
+    padding: 10px;
+    box-sizing: border-box; /* Ensures padding doesn't affect the width */
+    overflow-y: auto; /* Adds a vertical scrollbar if content exceeds the container height */
+    height: 200px; /* Set a fixed height for each container */
+}
+
+.supply-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #ddd; /* Adds a light gray line between rows */
+}
+
+.store-name-column, .availability-column {
+    flex: 1; /* This ensures each column takes equal space */
+}
+
+h2 {
+    color: #f4976c;
+}
+
+.navBar {
+    width: 15%;
+    display: flex;
+    flex-direction: column;
+    background-color: #303c6c;
+    border-radius: 0px 35px 35px 0px;
+    height: 94.9vh;
+    padding: 30px 0 0px 20px;
+    transform: translateX(-100%); 
+    animation: slideIn 1s ease-out forwards; 
+    transition:width 3s ease-in-out; 
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-100%);
+        opacity: 0; /* Start invisible */
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1; /* Fully visible */
+    }
+}
+
+.navBarRAPID {
+    font-family: 'Inter';
+    font-size: 24px;
+    color: #f4976c;
+    font-weight: 600;
+}
+
+.navBarText {
+    font-family: 'Inter';
+    font-size: 16px;
+    color: #f4976c;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.navBarText.active,
+.navBarText:hover {
+    color: white;
+}
+
+.MapContainerBig {
+    background-color: white;
+    height: 65vh;
+    padding: 20px;
+    width: 50%;
+    border-radius: 15px;
+    border: solid black 1.5px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); 
+}

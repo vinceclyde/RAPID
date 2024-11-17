@@ -52,15 +52,20 @@ body {
     color: white;
 }
 
-.help {
+.iconDiv {
+    display: flex;
+    flex-direction: row;
     margin-top: auto;
     margin-bottom: 30px;
-    width: 20px;
-    height: 20px;
-    transition: transform 0.3s ease;
+    gap: 20px;
 }
 
-.help:hover {
+.icon {
+    width: 25px;
+    height: 25px;
+    transition: transform 0.3s ease;
+}
+.icon:hover {
     transform: scale(1.4);
 }
 
@@ -88,6 +93,7 @@ body {
 }
 
 .regStoreCon1 {
+    font-family: 'Inter';
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -121,14 +127,18 @@ body {
 }
 
 .storeContainer {
+    padding: 30px;
+    font-family: 'Inter';
     display: flex;
-    flex-direction: row;
-    width: 100%;
-    height: 40%;
+    flex-direction: column;
+    width: 90%;
+    height: 40vh; /* Adjust to a percentage of the viewport height */
     border-radius: 15px;
     border: solid black 1.5px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    overflow: auto; /* Show scrollbars when content overflows */
 }
+
 
 .regStoreSubCon {
     display: flex;
@@ -164,6 +174,13 @@ body {
 
 .supply {
     width: 50%;
+}
+
+.centerDiv2 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
 }
 
 .centerDiv {
@@ -307,4 +324,26 @@ body {
     #alertCenter .icon {
         background-image: url('assets/alert.png');
     }
+}
+
+#suggestions {
+    max-height: 200px;      /* Set a fixed height for the suggestions container */
+    overflow-y: auto;       /* Make it scrollable if the content exceeds the height */
+    background-color: #fff; /* Optional: Add a background to differentiate from the page */
+    border: 1px solid #ccc; /* Optional: Add a border for visual separation */
+    border-radius: 4px;     /* Optional: Round the corners */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+    font-size: 14px;        /* Set a smaller font size */
+    padding: 5px 0;         /* Adjust padding */
+    position: absolute;     /* Make sure it appears over other content */
+        z-index: 999;           /* Ensure it appears on top of other content */
+}
+
+#suggestions li {
+    padding: 8px 10px;      /* Add padding around each suggestion */
+    cursor: pointer;       /* Change cursor to pointer to indicate clickable items */
+}
+
+#suggestions li:hover {
+    background-color: #f0f0f0; /* Optional: Highlight on hover */
 }

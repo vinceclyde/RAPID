@@ -10,167 +10,35 @@
 </head>
 <body>
     <div class="navBar">
-<!-- HTML -->
-            <p id="dashboard" class="navBarText">
-                <span class="icon" aria-hidden="true"></span> Dashboard
-            </p>
-            <p id="locatorMap" class="navBarText">
-                <span class="icon" aria-hidden="true"></span> Locator Map
-            </p>
-            <p id="storeRegistration" class="navBarText">
-                <span class="icon" aria-hidden="true"></span> Store Registration
-            </p>
-            <p id="roadClosure" class="navBarText">
-                <span class="icon" aria-hidden="true"></span> Road Closures
-            </p>
-            <p id="alertCenter" class="navBarText">
-                <span class="icon" aria-hidden="true"></span> Alert Center
-            </p>
+        <p id="dashboard" class="navBarText">
+            <span class="icon" aria-hidden="true"></span> Dashboard
+        </p>
+        <p id="locatorMap" class="navBarText">
+            <span class="icon" aria-hidden="true"></span> Locator Map
+        </p>
+        <p id="storeRegistration" class="navBarText">
+            <span class="icon" aria-hidden="true"></span> Store Registration
+        </p>
+        <p id="roadClosure" class="navBarText">
+            <span class="icon" aria-hidden="true"></span> Road Closures
+        </p>
+        <p id="alertCenter" class="navBarText">
+            <span class="icon" aria-hidden="true"></span> Alert Center
+        </p>
 
-        <div class="help">
-            <a href="about.html" target="_blank"><img src="https://i.ibb.co/ZYyVc52/Help-circle.png"></a>
+        <div class="iconDiv">
+            <a href="about.html" target="_blank"><img src="https://i.ibb.co/ZYyVc52/Help-circle.png" class="icon"></a>
+            <a href="RAPID.html" target="_self" onclick="preventBack(event)">
+                <img src="https://i.ibb.co/sw4wkfL/image-removebg-preview.png" class="icon">
+            </a>            
         </div>
     </div>
 
-    <!-- Dynamic content area -->
     <div id="contentArea"></div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const contentArea = document.getElementById("contentArea");
-            const navItems = document.querySelectorAll(".navBarText");
-
-            // Function to load HTML content from a file
-            function loadContent(file) {
-        fetch(file)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Could not load ${file}`);
-                }
-                return response.text();
-            })
-            .then(data => {
-                contentArea.innerHTML = data;
-            })
-            .catch(error => {
-                console.error("Error loading content:", error);
-                contentArea.innerHTML = "<p>Content not available.</p>";
-            });
-    }
-
-            // Function to update active class on navbar
-            function setActiveNavItem(activeItem) {
-                navItems.forEach(item => item.classList.remove("active"));
-                activeItem.classList.add("active");
-            }
-
-            // Load "Dashboard" by default on page load
-            loadContent("dashboardContent.html");
-            setActiveNavItem(document.getElementById("dashboard"));
-
-            // Event listeners for each nav item
-            document.getElementById("dashboard").addEventListener("click", () => {
-                loadContent("dashboardContent.html");
-                setActiveNavItem(document.getElementById("dashboard"));
-            });
-            document.getElementById("locatorMap").addEventListener("click", () => {
-                loadContent("locator.html");
-                setActiveNavItem(document.getElementById("locatorMap"));
-            });
-            document.getElementById("storeRegistration").addEventListener("click", () => {
-                loadContent("register-store.html");
-                setActiveNavItem(document.getElementById("storeRegistration"));
-            });
-            document.getElementById("alertCenter").addEventListener("click", () => {
-                loadContent("alert-center.html");
-                setActiveNavItem(document.getElementById("alertCenter"));
-            });
-            document.getElementById("roadClosure").addEventListener("click", () => {
-                loadContent("road-closure.html");
-                setActiveNavItem(document.getElementById("roadClosure"));
-            });
-        });
-
-        const apiBaseUrl = 'http://localhost:5000';
-
-// Fetch stores from the database and display them
-async function fetchStores() {
-    try {
-        const response = await fetch(`${apiBaseUrl}/get-stores`);
-        const stores = await response.json();
-
-        if (Array.isArray(stores)) {
-            displayStores(stores);
-        } else {
-            console.error("Invalid response format:", stores);
-        }
-    } catch (error) {
-        console.error("Error fetching stores:", error);
-    }
-}
-
-// Display stores in the UI
-function displayStores(stores) {
-    const storeList = document.getElementById("storeList");
-    storeList.innerHTML = ""; // Clear the existing list
-    stores.forEach(store => {
-        const storeInfo = document.createElement("div");
-        storeInfo.innerHTML = `
-            <strong>${store.name}</strong><br>
-            Address: ${store.address}<br>
-            Hours: ${store.hours}<br>
-            Contact: ${store.contact}<br>
-            Supply Type: ${store.supplyType}<br>
-            Supply Status: ${store.supplyStatus}<br><br>
-        `;
-        storeList.appendChild(storeInfo);
-    });
-}
-
-// Register a new store
-async function registerStore() {
-    const storeName = document.getElementById("storeName").value;
-    const storeAddress = document.getElementById("storeAddress").value;
-    const storeHours = document.getElementById("storeHours").value;
-    const contactNumber = document.getElementById("contactNumber").value;
-    const supplyType = document.querySelector('input[name="supplyType"]:checked') ? document.querySelector('input[name="supplyType"]:checked').value : "";
-    const supplyStatus = document.querySelector('input[name="supplyStatus"]:checked') ? document.querySelector('input[name="supplyStatus"]:checked').value : "";
-
-    if (!storeName || !storeAddress || !storeHours || !contactNumber || !supplyType || !supplyStatus) {
-        alert("Please fill out all fields.");
-        return;
-    }
-
-    const store = {
-        name: storeName,
-        address: storeAddress,
-        hours: storeHours,
-        contact: contactNumber,
-        supplyType: supplyType,
-        supplyStatus: supplyStatus
-    };
-
-    try {
-        const response = await fetch(`${apiBaseUrl}/register-store`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(store)
-        });
-        const data = await response.json();
-
-        if (data.message) {
-            alert(data.message);
-            fetchStores(); // Refresh the store list after registration
-        } else {
-            console.error("Error registering store:", data);
-        }
-    } catch (error) {
-        console.error("Error registering store:", error);
-    }
-}
-
-// Fetch and display stores on page load
-fetchStores();
-    </script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <script src="../dashboard.js"></script>
 </body>
 </html>

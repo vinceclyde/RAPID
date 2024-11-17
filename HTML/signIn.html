@@ -87,8 +87,13 @@
                     const result = await response.json();
     
                     if (response.ok) {
-                        // Success message and redirect to dashboard
+                        // Success message
                         alert(result.message);
+
+                        // Store the token in localStorage
+                        localStorage.setItem('authToken', result.token);
+                        
+                        // Redirect to user dashboard
                         window.location.href = 'dashboard.html';  // Default user dashboard redirect
                     } else {
                         // Error message

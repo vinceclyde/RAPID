@@ -54,7 +54,7 @@
             const popupText = document.getElementById("popupText");
 
             // Fetch terms and conditions content from a .txt file
-            fetch('terms.txt')
+            fetch('../terms.txt')
                 .then(response => response.text())
                 .then(data => {
                     popupText.innerHTML = data;
