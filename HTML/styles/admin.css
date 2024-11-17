@@ -1,0 +1,394 @@
+/* Admin Container */
+.adminContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    height: 90vh;
+    width: 75vw;
+    margin: 0 auto;
+    padding: 15px;
+}
+
+/* Top Container */
+.topContainer {
+    flex-direction: row;
+    display: flex;
+    align-items: center;
+    height: 10%;
+    width: 100%; /* Ensure full width */
+    gap: 20px; 
+}
+
+
+.admintitle h2 {
+    font-family: 'Inter';
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #303C6C;
+    text-align: right;
+}
+
+/* Style for the sortby container */
+.sortby {
+    display: flex;
+    align-items: center;
+    border-radius: 15px;
+    border: 1px solid black;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 5px 10px;
+    margin: 0; 
+}
+
+
+/* Style for the label */
+.sortby label {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    margin: 0 5px; /* Tight spacing with dropdown */
+    color: #7E7E7E;
+}
+
+/* Style for the dropdown */
+.sortby select {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 8px;
+    border: none;
+    color: #303C6C; /* Text color for selected option */
+    cursor: pointer;
+}
+
+/* Style for dropdown options */
+.sortby select option {
+    color: #303C6C; /* Dark blue color for all options */
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    background-color: #fff; /* Ensure white background */
+}
+
+/* Hover and focus effects for the dropdown */
+.sortby select:hover {
+    border-color: #303C6C; /* Blue highlight for border */
+}
+
+.sortby select:focus {
+    border-color: #303C6C;
+    box-shadow: none;
+    outline: none;
+}
+
+
+.tablecontainer {
+    display: flex-start;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border-radius: 15px;
+    border: 1px solid black;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    height: 70%; 
+    width: 100%;
+    position: relative; /* Ensure child elements like pagination are positioned relative to this container */
+    overflow-x: auto; /* Allow horizontal scrolling if needed */
+}
+
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    overflow: hidden;
+}
+
+thead {
+    text-align: center;
+}
+
+th, td {
+    text-align: center;
+    padding: 10px 12px;
+}
+
+th {
+    font-weight: bold;
+    color: #202a48;
+}
+
+/* Supply Status Button */
+.supply-status {
+    color: #303C6C;
+    border: 1px solid #FFD700;
+    border-radius: 2px;
+    padding: 0 8px;  /* Adjust padding for horizontal centering */
+    font-weight: 400;
+    text-align: center;
+    font-size: 12px;  /* Smaller font size */
+    width: 120px;  /* Reduced width */
+    height: 25px;  /* Reduced height */
+    display: inline-block; 
+    line-height: 25px;  /* Vertically center text */
+}
+/* Edit Button */
+.edit-button {
+    background-color: #303C6C;
+    width: 100px;
+    color: white;
+    border: none;
+    border-radius: 15px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-weight: 400;
+    font-size: 10px;
+}
+
+.edit-button:hover {
+    background-color: #202a48;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    margin-top: 20px;
+    width: 18%;
+}
+        /* Pagination buttons styles */
+
+        .pagination button {
+            border-radius: 5px;
+            margin: 10px;
+            height: 35px;
+            border: 1px solid #EEEEEE;
+            background-color: #F5F5F5;
+            cursor: pointer;
+        }
+        
+        .pagination button:disabled {
+            background-color: #EEEEEE;
+            cursor: not-allowed;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background-color: #ddd;
+        }
+
+        .pagination .page-number {
+            cursor: pointer;
+        }
+
+        .pagination .page-number.active {
+            font-weight: bold;
+            background-color: #F4976C;
+            color: white;
+        }
+
+.roadManipulation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    gap: 10px;
+    height: 30%; /* Smallest container */
+    width: 100%;
+}
+
+.reportedRoadClosure, .roadReopen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 15px;
+    width: 100%;
+    border: 1px solid black;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    height: 100%; /* Adjust as needed */
+    text-align: center;
+}
+
+.reportedRoadClosure {
+    background-color: #FBE8A6;
+}
+
+@media (max-width: 1024px) {
+    .adminContainer {
+        width: 90vw;
+    }
+}
+
+@media (max-width: 768px) {
+    .adminContainer {
+        width: 100vw;
+        padding: 10px;
+    }
+}
+
+/* Top Container */
+.topContainer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; 
+    height: 10%;
+    width: 100%;
+    gap: 20px;
+}
+
+@media (max-width: 768px) {
+    .tablecontainer {
+        height: auto;
+        padding: 10px;
+    }
+}
+
+.admintitle {
+    margin-right: auto; 
+}
+
+.admintitle h2 {
+    font-family: 'Inter';
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #303C6C;
+    text-align: right;
+}
+
+/* Sortby Container */
+.sortby {
+    display: flex;
+    align-items: center;
+    margin: 0 10px;
+    border-radius: 15px;
+    border: 1px solid black;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 5px 10px;
+}
+
+.sortby select {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 8px;
+    border: none;
+    color: #303C6C;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .sortby {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .sortby select {
+        width: 100%;
+        padding: 6px;
+    }
+}
+
+/* Table Container */
+.tablecontainer {
+    display: flex-start;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border-radius: 15px;
+    border: 1px solid black;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    height: 70%;
+    width: 100%;
+    position: relative;
+}
+
+@media (max-width: 768px) {
+    .tablecontainer {
+        height: auto;
+        padding: 10px;
+    }
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+}
+
+thead {
+    text-align: center;
+}
+
+th, td {
+    text-align: center;
+    padding: 10px 12px;
+}
+
+th {
+    font-weight: bold;
+    color: #202a48;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
+.pagination button {
+    padding: 8px 16px;
+    width: 150px;
+    margin: 0 5px;
+    border: 1px solid #ccc;
+    background-color: #F5F5F5;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .pagination button {
+        width: 120px;
+        padding: 6px 12px;
+    }
+}
+
+/* Road Manipulation */
+.roadManipulation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    gap: 10px;
+    height: 30%;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .roadManipulation {
+        flex-direction: column;
+    }
+}
+
+.reportedRoadClosure, .roadReopen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 15px;
+    width: 100%;
+    border: 1px solid black;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    height: 100%;
+    text-align: center;
+}
+
+.reportedRoadClosure {
+    background-color: #FBE8A6;
+}
