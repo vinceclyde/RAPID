@@ -1,0 +1,115 @@
+.alertCenterContainer {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+    gap: 35px;
+    height: 90vh;
+    width: 75vw;
+    padding: 15px;
+}
+
+.supplyShortageTitle h2 {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(0.8rem, 2vw, 1.5rem);
+    font-weight: bold;
+    color: #f4976c;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.supplyShortageLayout {
+    width: clamp(50%, 75%, 80%);
+}
+
+.roadUpdatesLayout {
+    width: clamp(25%, 35%, 40%);
+}
+
+.supplyShortageContainer, .roadUpdatesContainer {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    border-radius: 15px;
+    border: 1px solid black;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); 
+    height: 85vh;
+    text-align: center;
+}
+
+.supplyShortageContainer {
+    background-color: #D1FDFE;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.SupplyLayout {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    margin: 5px;
+}
+
+.supplyTitle h4 {
+    margin-bottom: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
+    font-weight: bold;
+    color: #f4976c;
+}
+
+.SupplyContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 10px;
+    gap: 10px;
+    padding: 10px;
+}
+
+.runningLow, .outofStock {
+    width: clamp(80%, 90%, 95%);
+    height: clamp(180px, 220px, 250px);
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 15px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.roadUpdatesContainer {
+    background-color: #FBE8A6;
+    gap: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.roadClosedLayout, .roadReOpenLayout {
+    width: clamp(90%, 95%, 100%);
+    height: clamp(40%, 45%, 50%);
+    text-align: center;
+}
+
+.roadTitle h4 {
+    margin: 10px;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
+    font-weight: bold;
+    color: #303C6C;
+    margin-bottom: 5px;
+}
+
+.roadContainer {
+    background-color: white;
+    margin: 10px;
+    border: 1px solid black;
+    border-radius: 15px;
+    height: clamp(200px, 250px, 300px);
+    padding: 5px;
+}
