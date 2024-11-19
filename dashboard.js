@@ -388,7 +388,7 @@ async function fetchSupplies() {
     }
 
     try {
-        const response = await fetch('http://localhost:5000/get-supplies', {
+        const response = await fetch(`${apiBaseUrl}/get-supplies`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -415,15 +415,15 @@ async function fetchSupplies() {
                     const supplyItem = document.createElement('div');
                     supplyItem.classList.add('supply-item');
                 
-                    const address = document.createElement('div');
-                    address.classList.add('address-column');
-                    address.textContent = supply.address || "No Name Available"; // Fallback if name is missing
+                    const name = document.createElement('div');
+                    name.classList.add('address-column');
+                    name.textContent = supply.name || "No Name Available"; // Fallback if name is missing
                 
                     const availability = document.createElement('div');
                     availability.classList.add('availability-column');
                     availability.textContent = supply.supplyStatus;
                 
-                    supplyItem.appendChild(address);
+                    supplyItem.appendChild(name);
                     supplyItem.appendChild(availability);
                     supplyContainer.appendChild(supplyItem);
                 });

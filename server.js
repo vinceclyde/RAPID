@@ -70,7 +70,7 @@ app.get('/get-supplies', authenticate, async (req, res) => {
                     _id: "$supplyType", // Group by supplyType
                     supplies: {
                         $push: {
-                            address: "$address",      // Push the address of the store
+                            name: "$name",      // Push the address of the store
                             supplyStatus: "$supplyStatus" // Push the supply status
                         }
                     }

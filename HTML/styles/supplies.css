@@ -119,3 +119,17 @@ h2 {
     border: solid black 1.5px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); 
 }
+
+.supply-item:last-child {
+    border-bottom: none;
+}
+
+.name-column {
+    width: 70%; 
+    text-align: left; 
+}
+
+.availability-column {
+    width: 30%; 
+    text-align: right; 
+}
