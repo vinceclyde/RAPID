@@ -47,7 +47,7 @@ function convertToObjectId(id) {
 
 // Utility function to process store data
 async function processStore(storeData, userId) {
-    const { name, address, hours, contact, supplyType, supplyStatus } = storeData;
+    const { name, address, hours, contact, supplyType, supplyStatus, latitude, longitude } = storeData;
     return {
         name,
         address,
@@ -55,11 +55,12 @@ async function processStore(storeData, userId) {
         contact,
         supplyType,
         supplyStatus,
-        userId
+        userId,
+        location: { type: 'Point', coordinates: [longitude, latitude] } // Store location as GeoJSON
     };
 }
 
-// Public route to fetch supplies (no authentication needed)
+
 // Public route to fetch supplies (authentication required but returns all supplies)
 app.get('/get-supplies', authenticate, async (req, res) => {
     console.log("Fetching supplies...");
@@ -71,7 +72,9 @@ app.get('/get-supplies', authenticate, async (req, res) => {
                     supplies: {
                         $push: {
                             name: "$name",      // Push the address of the store
-                            supplyStatus: "$supplyStatus" // Push the supply status
+                            supplyStatus: "$supplyStatus", // Push the supply status
+                            latitude: { $arrayElemAt: ["$location.coordinates", 1] }, // Extract latitude from GeoJSON
+                            longitude: { $arrayElemAt: ["$location.coordinates", 0] } // Extract longitude from GeoJSON
                         }
                     }
                 }
@@ -79,7 +82,8 @@ app.get('/get-supplies', authenticate, async (req, res) => {
         ]).toArray();
         
 
-        console.log("Supplies fetched:", supplies); // Debugging line
+        console.log("Supplies fetched:", supplies);
+        // Debugging line
         res.json(supplies); // Return the supplies data
     } catch (err) {
         console.error("Error fetching supplies:", err); // Debugging line
@@ -147,7 +151,20 @@ app.post('/login', async (req, res) => {
 // Register Store endpoint (requires authentication)
 app.post('/register-store', authenticate, async (req, res) => {
     try {
-        const newStore = await processStore(req.body, req.user._id);
+        const { name, address, hours, contact, supplyType, supplyStatus, latitude, longitude } = req.body;
+
+        // Validate and process the store data
+        const newStore = {
+            name,
+            address,
+            hours,
+            contact,
+            supplyType,
+            supplyStatus,
+            location: { type: 'Point', coordinates: [longitude, latitude] }, // Store location as GeoJSON
+            userId: req.user._id
+        };
+
         const result = await storesCollection.insertOne(newStore);
         if (result.acknowledged) {
             res.json({ message: 'Store registered successfully' });
@@ -158,6 +175,7 @@ app.post('/register-store', authenticate, async (req, res) => {
         res.status(500).json({ error: 'Error registering store' });
     }
 });
+
 
 // Fetch stores for the authenticated user (requires authentication)
 app.get('/get-stores', authenticate, async (req, res) => {

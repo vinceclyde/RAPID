@@ -67,7 +67,9 @@ function initializeMap() {
     window.map = map; // Store map reference globally
 }
 
-// Function to handle address input and show suggestions
+let selectedLatitude = null;
+let selectedLongitude = null;
+
 function setupAddressInput() {
     const storeAddress = document.getElementById('storeAddress');
     const suggestionsList = document.getElementById('suggestions');
@@ -96,6 +98,8 @@ function setupAddressInput() {
                     window.map.setView([item.lat, item.lon], 15); // Zoom to the location
                     L.marker([item.lat, item.lon]).addTo(window.map); // Add a marker
                     storeAddress.value = item.display_name; // Set the selected address
+                    selectedLatitude = item.lat; // Store latitude
+                    selectedLongitude = item.lon; // Store longitude
                     suggestionsList.innerHTML = ''; // Clear suggestions
                 });
 
@@ -106,6 +110,7 @@ function setupAddressInput() {
         }
     });
 }
+
 
 // Fetch stores from the database and display them immediately upon page load
 async function fetchStores() {
@@ -197,13 +202,20 @@ async function registerStore() {
     const supplyType = document.querySelector('input[name="supplyType"]:checked').value || "";
     const supplyStatus = document.querySelector('input[name="supplyStatus"]:checked').value || "";
 
+    if (!selectedLatitude || !selectedLongitude) {
+        alert("Please select a valid address from the suggestions.");
+        return;
+    }
+
     const store = {
         name: storeName,
         address: storeAddress,
         hours: storeHours,
         contact: contactNumber,
         supplyType,
-        supplyStatus
+        supplyStatus,
+        latitude: selectedLatitude, // Send latitude
+        longitude: selectedLongitude // Send longitude
     };
 
     try {
@@ -219,8 +231,8 @@ async function registerStore() {
         const data = await response.json();
         if (data.message) {
             alert(data.message);
-            fetchStores();
-            clearStoreForm();
+            fetchStores(); // Refresh the stores list
+            clearStoreForm(); // Clear the form after submission
         } else {
             console.error('Error registering store:', data);
         }
@@ -228,6 +240,7 @@ async function registerStore() {
         console.error('Error during store registration:', error);
     }
 }
+
 
 function clearStoreForm() {
     document.getElementById("storeName").value = "";
@@ -331,7 +344,9 @@ async function updateStore() {
         hours: storeHours,
         contact: contactNumber,
         supplyType,
-        supplyStatus
+        supplyStatus,
+        latitude: selectedLatitude, // Updated latitude
+        longitude: selectedLongitude // Updated longitude
     };
 
     try {
@@ -347,8 +362,20 @@ async function updateStore() {
         const data = await response.json();
         if (data.message) {
             alert(data.message);
-            fetchStores();  // Refresh the stores after update
-            clearStoreForm(); 
+
+            // Remove existing map instance
+            if (window.map) {
+                window.map.remove();
+            }
+
+            // Reinitialize map
+            initializeMap();
+
+            // Fetch and display updated stores
+            fetchStores();
+
+            // Clear the form
+            clearStoreForm();
         } else {
             console.error('Error updating store:', data);
         }
@@ -379,7 +406,6 @@ function displayStores(stores) {
         storeList.appendChild(storeInfo);
     });
 }
-
 async function fetchSupplies() {
     const token = localStorage.getItem('authToken');
     if (!token) {
@@ -399,35 +425,95 @@ async function fetchSupplies() {
         const data = await response.json();
 
         if (response.ok) {
-            // Handle the supplies data here and display it in the HTML
+            const map = L.map('map').setView([13.7565, 121.0583], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
             const suppliesList = document.getElementById('supplies-list');
-            suppliesList.innerHTML = ''; // Clear the previous supplies
+            suppliesList.innerHTML = '';
+
+            const markerMap = {}; // Map to store markers by supply ID or some unique property
+
+            // Sort data by supply type (e.g., by _id)
+            data.sort((a, b) => a._id.localeCompare(b._id));
 
             data.forEach(supplyType => {
                 const supplyContainer = document.createElement('div');
                 supplyContainer.classList.add('supply-container');
 
                 const typeHeader = document.createElement('h2');
-                typeHeader.textContent = ` ${supplyType._id} Supply`;
+                typeHeader.textContent = `${supplyType._id} Supply`;
                 supplyContainer.appendChild(typeHeader);
+
+                // Sort supplies by name
+                supplyType.supplies.sort((a, b) => {
+                    const nameA = a.name || ''; // Handle missing names
+                    const nameB = b.name || '';
+                    return nameA.localeCompare(nameB);
+                });
 
                 supplyType.supplies.forEach(supply => {
                     const supplyItem = document.createElement('div');
                     supplyItem.classList.add('supply-item');
-                
+
                     const name = document.createElement('div');
                     name.classList.add('address-column');
-                    name.textContent = supply.name || "No Name Available"; // Fallback if name is missing
-                
+                    name.textContent = supply.name || "No Name Available";
+
                     const availability = document.createElement('div');
                     availability.classList.add('availability-column');
-                    availability.textContent = supply.supplyStatus;
-                
+
+                    switch (supply.supplyStatus) {
+                        case 'Available':
+                            availability.textContent = supply.supplyStatus;
+                            availability.style.color = 'green';
+                            break;
+                        case 'Limited':
+                            availability.textContent = supply.supplyStatus;
+                            availability.style.color = 'orange';
+                            break;
+                        case 'Out Of Stock':
+                            availability.textContent = supply.supplyStatus;
+                            availability.style.color = 'red';
+                            break;
+                        default:
+                            availability.textContent = 'Status Unknown';
+                            availability.style.color = 'gray';
+                            break;
+                    }
+
                     supplyItem.appendChild(name);
                     supplyItem.appendChild(availability);
                     supplyContainer.appendChild(supplyItem);
+
+                    if (supply.latitude && supply.longitude) {
+                        const latLng = [supply.latitude, supply.longitude];
+                        const markerIcon = createCustomMarker(supplyType._id);
+
+                        const marker = L.marker(latLng, { icon: markerIcon }).addTo(map);
+
+                        const popupContent = `
+                            <div class="popup-content">
+                                <b>Store Name:</b> ${supply.name || "No Name Available"}<br>
+                                <b>Status:</b> ${supply.supplyStatus}<br>
+                                <b>Location:</b> Latitude: ${supply.latitude}, Longitude: ${supply.longitude}<br>
+                                <b>Supply Type:</b> ${supplyType._id}
+                            </div>
+                        `;
+                        marker.bindPopup(popupContent);
+
+                        // Save marker reference
+                        markerMap[supply.name] = marker;
+
+                        // Add click event to supply item
+                        supplyItem.addEventListener('click', () => {
+                            map.setView(latLng, 15); // Pan and zoom to marker
+                            marker.openPopup(); // Open the popup
+                        });
+                    }
                 });
-                
 
                 suppliesList.appendChild(supplyContainer);
             });
@@ -442,6 +528,34 @@ async function fetchSupplies() {
 }
 
 
+function createCustomMarker(status) {
+    let markerColor;
 
-        // Call the fetchSupplies function when the page is loaded
-        window.onload = fetchSupplies;
+    switch (status) {
+        case 'Food':
+            markerColor = 'green';
+            break;
+        case 'Medicine':
+            markerColor = 'yellow';
+            break;
+        case 'Gas':
+            markerColor = 'red';
+            break;
+        case 'Water':
+            markerColor = 'blue';
+            break;
+        default:
+            markerColor = 'black';
+            break;
+    }
+
+    return new L.Icon({
+        iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${markerColor}.png`,
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+    });
+}
+
+
+window.onload = fetchSupplies();
