@@ -1,0 +1,68 @@
+@media only screen and (max-width: 768px) {
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        flex-direction: column;
+        width: 75vw;
+        height: auto;
+        gap: 20px;
+        padding: 10px;
+    }
+
+    .regStoreCon1, 
+    .regStoreCon2 {
+        width: 90%;
+        height: auto;
+        padding: 15px;
+        margin: 0 auto;
+    }
+
+    .mapContainerSmall {
+        height: 40vh;
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .storeContainer {
+        width: 90%;
+        height: auto;
+        padding: 20px;
+        overflow-y: auto;
+    }
+
+    .regStoreSubCon {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .input,
+    .input2,
+    .supply {
+        width: 90%;
+    }
+
+    .centerDiv, 
+    .centerDiv2 {
+        flex-direction: row;
+        gap: 15px;
+    }
+
+    .submitButton {
+        width: 100%;
+        font-size: 14px;
+        padding: 10px;
+    }
+    
+    fieldset.supply {
+        width: 90%;
+        margin-bottom: 10px;
+    }
+
+    #map {
+        height: 300px; 
+    }
+}
+
