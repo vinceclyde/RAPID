@@ -30,7 +30,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;/* Vertically cent er the content */
-    gap: 5px; /* Space between the image and the header */
+    gap: 10px; /* Space between the image and the header */
 }
 
 .supply-type-icon {
@@ -192,6 +192,5 @@ h2 {
 .popup-content br {
     margin-bottom: 5px;
 }
-
 
 

@@ -389,23 +389,48 @@ async function updateStore() {
 function displayStores(stores) {
     const storeList = document.getElementById("storeList");
     storeList.innerHTML = ""; // Clear the existing list
+
+    if (stores.length === 0) {
+        storeList.innerHTML = "<p>No registered stores available.</p>";
+        return;
+    }
+
+    // Create table and headers
+    const table = document.createElement("table");
+    table.classList.add("store-table");
+
+    const headerRow = document.createElement("tr");
+    headerRow.innerHTML = `
+        <th>Select</th>
+        <th>Store Name</th>
+        <th>Address</th>
+        <th>Hours</th>
+        <th>Contact</th>
+        <th>Supply Type</th>
+        <th>Supply Status</th>
+    `;
+    
+    table.appendChild(headerRow);
+
     stores.forEach(store => {
-        const storeInfo = document.createElement("div");
-        storeInfo.innerHTML = `
-            <input type="radio" name="selectedStore" value="${store._id}" id="store-${store._id}">
-            <label for="store-${store._id}">
-                <strong>${store.name}</strong><br>
-                Address: ${store.address}<br>
-                Hours: ${store.hours}<br>
-                Contact: ${store.contact}<br>
-                Supply Type: ${store.supplyType}<br>
-                Supply Status: ${store.supplyStatus}<br>
-            </label>
-            <hr>
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td><input type="radio" name="selectedStore" value="${store._id}" id="store-${store._id}"></td>
+            <td>${store.name}</td>
+            <td>${store.address}</td>
+            <td>${store.hours}</td>
+            <td>${store.contact}</td>
+            <td>${store.supplyType}</td>
+            <td>${store.supplyStatus}</td>
         `;
-        storeList.appendChild(storeInfo);
+
+        table.appendChild(row);
     });
+
+    storeList.appendChild(table);
 }
+
 async function fetchSupplies() {
     const token = localStorage.getItem('authToken');
     if (!token) {
@@ -574,7 +599,7 @@ function createCustomMarker(status) {
 
     return new L.Icon({
         iconUrl: iconUrl,
-        iconSize: [50, 50], 
+        iconSize: [40, 40], 
         iconAnchor: [20, 40],  
         popupAnchor: [0, -40],  // Adjust for the popup positio
     });
