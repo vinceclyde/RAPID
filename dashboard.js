@@ -436,16 +436,39 @@ async function fetchSupplies() {
 
             const markerMap = {}; // Map to store markers by supply ID or some unique property
 
-            // Sort data by supply type (e.g., by _id)
-            data.sort((a, b) => a._id.localeCompare(b._id));
+                        // Define icons for each supply type
+                        const iconMap = {
+                            Food: 'styles/assets/food_icon.png',
+                            Medical: 'styles/assets/medic_icon.png',
+                            Gas: 'styles/assets/gas_icon.png',
+                            Water: 'styles/assets/water_icon.png',
+                        };
+
 
             data.forEach(supplyType => {
                 const supplyContainer = document.createElement('div');
                 supplyContainer.classList.add('supply-container');
 
+                // Create a container for the header and image
+                const headerContainer = document.createElement('div');
+                headerContainer.classList.add('header-container');
+
+                // Create the image element
+                const typeImage = document.createElement('img');
+                typeImage.src = iconMap[supplyType._id] || 'assets/icons/default.png'; // Use default icon if not found
+                typeImage.alt = `${supplyType._id} Icon`;
+                typeImage.classList.add('supply-type-icon');
+
+                // Create the header
                 const typeHeader = document.createElement('h2');
                 typeHeader.textContent = `${supplyType._id} Supply`;
-                supplyContainer.appendChild(typeHeader);
+
+                // Append the image and header to the container
+                headerContainer.appendChild(typeImage);
+                headerContainer.appendChild(typeHeader);
+
+                // Append the header container to the supply container
+                supplyContainer.appendChild(headerContainer);
 
                 // Sort supplies by name
                 supplyType.supplies.sort((a, b) => {
@@ -527,33 +550,33 @@ async function fetchSupplies() {
     }
 }
 
-
+//Dashboard map markers
 function createCustomMarker(status) {
-    let markerColor;
+    let iconUrl;
 
     switch (status) {
         case 'Food':
-            markerColor = 'green';
+            iconUrl = 'styles/assets/food_icon.png';  
             break;
-        case 'Medicine':
-            markerColor = 'yellow';
+        case 'Medical':
+            iconUrl = 'styles/assets/medic_icon.png';  
             break;
         case 'Gas':
-            markerColor = 'red';
+            iconUrl = 'styles/assets/gas_icon.png';  
             break;
         case 'Water':
-            markerColor = 'blue';
+            iconUrl = 'styles/assets/water_icon.png';  
             break;
         default:
-            markerColor = 'black';
+            iconUrl = 'styles/assets/black.png';  
             break;
     }
 
     return new L.Icon({
-        iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${markerColor}.png`,
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
+        iconUrl: iconUrl,
+        iconSize: [50, 50], 
+        iconAnchor: [20, 40],  
+        popupAnchor: [0, -40],  // Adjust for the popup positio
     });
 }
 
