@@ -72,13 +72,26 @@
 .runningLow, .outofStock {
     width: clamp(80%, 90%, 95%);
     height: clamp(150px, 25vh, 300px);
+    flex-direction: row;
     background-color: white;
     border: 1px solid black;
     border-radius: 15px;
     text-align: center;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
+}
+
+.runningLow p, .outofStock p {
+    position: absolute;
+    font-size: 12px; 
+    font-weight: bold;
+    font-family: 'Inter', sans-serif; 
+    color: #333;
+}
+
+.supplystatustitle p {
+    font-size: 10px;
 }
 
 .roadUpdatesContainer {
