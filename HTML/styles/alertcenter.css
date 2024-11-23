@@ -3,10 +3,10 @@
     align-items: center;
     flex-direction: row;
     justify-content: center;
-    gap: 35px;
-    height: 90vh;
-    width: 75vw;
-    padding: 15px;
+    gap: calc(2vw + 15px);
+    height: clamp(70vh, 90vh, 100vh);
+    width: clamp(60vw, 75vw, 90vw);
+    padding: calc(1vw + 15px);
 }
 
 .supplyShortageTitle h2 {
@@ -19,7 +19,8 @@
 }
 
 .supplyShortageLayout {
-    width: clamp(50%, 75%, 80%);
+    width: clamp(45%, 65%, 80%);
+    max-width: 100%;
 }
 
 .roadUpdatesLayout {
@@ -70,14 +71,27 @@
 
 .runningLow, .outofStock {
     width: clamp(80%, 90%, 95%);
-    height: clamp(180px, 220px, 250px);
+    height: clamp(150px, 25vh, 300px);
+    flex-direction: row;
     background-color: white;
     border: 1px solid black;
     border-radius: 15px;
     text-align: center;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
+}
+
+.runningLow p, .outofStock p {
+    position: absolute;
+    font-size: 12px; 
+    font-weight: bold;
+    font-family: 'Inter', sans-serif; 
+    color: #333;
+}
+
+.supplystatustitle p {
+    font-size: 10px;
 }
 
 .roadUpdatesContainer {
@@ -90,26 +104,31 @@
 }
 
 .roadClosedLayout, .roadReOpenLayout {
-    width: clamp(90%, 95%, 100%);
-    height: clamp(40%, 45%, 50%);
+    width: clamp(70%, 75%, 80%);
+    height: clamp(35%, 45%, 50%);
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: calc(0.5vw + 5px);
 }
 
 .roadTitle h4 {
-    margin: 10px;
-    padding: 0;
+    margin-bottom: 0;
     font-family: 'Inter', sans-serif;
     font-size: clamp(0.875rem, 2.5vw, 1rem);
     font-weight: bold;
     color: #303C6C;
-    margin-bottom: 5px;
 }
 
 .roadContainer {
     background-color: white;
-    margin: 10px;
+    margin: calc(0.5vw + 5px); 
     border: 1px solid black;
     border-radius: 15px;
-    height: clamp(200px, 250px, 300px);
-    padding: 5px;
+    height: clamp(180px, 25vh, 300px);
+    padding: calc(0.5vw + 5px);
+    width: 100%; 
+    max-width: 500px; 
 }
