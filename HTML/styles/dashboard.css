@@ -83,6 +83,7 @@ body {
     gap: 10px;
 }
 
+
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -98,6 +99,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    align-items: center;
     border-radius: 15px;
     border: solid black 1.5px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
@@ -147,6 +149,16 @@ body {
     gap: 10px;
 }
 
+.regStoreSubCon2 {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
 .label,
 .input,
 .input2,
@@ -161,7 +173,7 @@ body {
     border-radius: 15px;
     padding: 10px;
     border: solid black 1.5px;
-    margin: 5px 0 15px 0;
+    margin: 5px 0 10px 0;
 }
 
 .input {
@@ -286,6 +298,7 @@ body {
 }
 
 #suggestions {
+    display: none;
     max-height: 200px;      /* Set a fixed height for the suggestions container */
     overflow-y: auto;       /* Make it scrollable if the content exceeds the height */
     background-color: #fff; /* Optional: Add a background to differentiate from the page */
@@ -295,8 +308,17 @@ body {
     font-size: 14px;        /* Set a smaller font size */
     padding: 5px 0;         /* Adjust padding */
     position: absolute;     /* Make sure it appears over other content */
-        z-index: 999;           /* Ensure it appears on top of other content */
+    z-index: 999;           /* Ensure it appears on top of other content */
+    width: 100%;            /* Make the width match the input field */
+    left: 0;                /* Align it to the left edge of the parent container */
+    margin-top: 50px;
 }
+
+.addressCon {
+    position: relative;     /* Ensure the suggestions list is positioned correctly within this container */
+    width: 100%;            /* Make the container take full available width */
+}
+
 
 #suggestions li {
     padding: 8px 10px;      /* Add padding around each suggestion */
@@ -305,4 +327,28 @@ body {
 
 #suggestions li:hover {
     background-color: #f0f0f0; /* Optional: Highlight on hover */
+}
+
+.locationButton {
+    font-family: 'Inter';
+    border-radius: 15px;
+    font-size: 10px;
+    background-color: #f4976c;
+    color: white;
+    border: none;
+    width: 30%;
+    padding: 5px;
+    transition: background-color 0.5s ease;
+}
+
+.locationButton:hover {
+    background: black;
+    color: white;
+}
+
+.addressCon {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-bottom: 10px;
 }

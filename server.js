@@ -5,6 +5,8 @@ const bodyParser = require('body-parser');
 const { MongoClient, ObjectId } = require('mongodb');
 const jwt = require('jsonwebtoken');
 const authenticate = require('./middleware/auth'); // Import the authentication middleware
+const multer = require('multer');
+const path = require('path');
 
 const app = express();
 
@@ -22,12 +24,14 @@ const client = new MongoClient(uri, {
 
 let usersCollection;
 let storesCollection;
+let roadClosures;
 
 // Connect to MongoDB
 client.connect()
     .then(() => {
         usersCollection = client.db('RAPID').collection('users'); // 'users' collection
         storesCollection = client.db('RAPID').collection('stores'); // 'stores' collection
+        roadClosures = client.db('RAPID').collection('roadClosures');
         console.log('Connected to MongoDB');
     })
     .catch((err) => {
@@ -250,6 +254,39 @@ app.delete('/delete-store/:id', authenticate, async (req, res) => {
         res.status(500).json({ error: 'Error deleting store' });
     }
 });
+
+app.post('/api/report-road-closure', async (req, res) => {
+    console.log('Request Body:', req.body);
+
+    const { reporterName, roadAddress, roadReason } = req.body;
+
+    // Check if required fields are provided
+    if (!reporterName || !roadAddress || !roadReason) {
+        return res.status(400).json({ error: 'All fields are required.' });
+    }
+
+    try {
+        // Insert the data into MongoDB
+        const reportData = {
+            reporterName,
+            roadAddress,
+            roadReason,
+            createdAt: new Date()
+        };
+
+        const result = await client.db('RAPID').collection('roadClosures').insertOne(reportData);
+
+        if (result.acknowledged) {
+            res.json({ success: true });
+        } else {
+            res.status(500).json({ error: 'Failed to submit road closure report.' });
+        }
+    } catch (err) {
+        console.error('Error submitting report:', err);
+        res.status(500).json({ error: 'An error occurred while submitting the report.' });
+    }
+});
+
 
 // Start the server
 app.listen(5000, () => {

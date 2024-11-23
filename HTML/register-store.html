@@ -16,9 +16,12 @@
         <input class="input" type="text" id="storeName" required><br>
 
         <label class="label" for="storeAddress">Address</label>
-        <input class="input" type="text" id="storeAddress" required><br>
+        <div class="addressCon">
+        <input class="input" type="text" id="storeAddress" required>
+        <button type="button" class="locationButton" onclick="useCurrentLocation()">Use My Location</button>
         <ul id="suggestions"></ul>
-
+        </div>
+ 
         <div class="regStoreSubCon">
             <div class="field">
                 <label class="label" for="storeHours">Store Hours</label>
@@ -67,7 +70,6 @@
      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
      crossorigin=""></script>
-    <script src="../map.js"></script>
 
 </div>
 </div>

@@ -52,7 +52,12 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     document.getElementById("roadClosure").addEventListener("click", () => {
-        loadContent("road-closure.html");
+        window.open("road-closure.html", "_blank"); // Opens the page in a new tab
+    });
+    
+    
+    document.getElementById("adminDashboard").addEventListener("click", () => {
+        loadContent("admin.html");
     });
 });
 
@@ -79,6 +84,7 @@ function setupAddressInput() {
 
         if (query.length < 3) {
             suggestionsList.innerHTML = ''; // Clear suggestions if input is too short
+            suggestionsList.style.display = 'none'; // Hide suggestions
             return;
         }
 
@@ -89,6 +95,12 @@ function setupAddressInput() {
             const suggestions = await response.json();
 
             suggestionsList.innerHTML = ''; // Clear previous suggestions
+
+            if (suggestions.length > 0) {
+                suggestionsList.style.display = 'block'; // Show suggestions if there are any
+            } else {
+                suggestionsList.style.display = 'none'; // Hide if no suggestions
+            }
 
             suggestions.forEach((item) => {
                 const listItem = document.createElement('li');
@@ -101,16 +113,119 @@ function setupAddressInput() {
                     selectedLatitude = item.lat; // Store latitude
                     selectedLongitude = item.lon; // Store longitude
                     suggestionsList.innerHTML = ''; // Clear suggestions
+                    suggestionsList.style.display = 'none'; // Hide suggestions list after selection
                 });
 
                 suggestionsList.appendChild(listItem);
             });
         } catch (error) {
             console.error('Error fetching suggestions:', error);
+            suggestionsList.style.display = 'none'; // Hide suggestions if there's an error
         }
     });
 }
 
+function useCurrentLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (position) => {
+            const { latitude, longitude } = position.coords;
+
+            // Reverse geocoding API request
+            const apiKey = "AIzaSyBuKitXZZvPXjHXVebv0bVBrEpdj4dFhH8"; // Replace with your API key
+            const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.results && data.results[0]) {
+                    const address = data.results[0].formatted_address; // Correct property
+                    document.getElementById("storeAddress").value = address;
+
+                    // Set map view to current location and add a marker
+                    window.map.setView([latitude, longitude], 15);
+                    L.marker([latitude, longitude]).addTo(window.map)
+                    
+                    // Store the selected latitude and longitude
+                    selectedLatitude = latitude;
+                    selectedLongitude = longitude;
+                } else {
+                    alert("Unable to fetch address. Please try again.");
+                }
+            } catch (error) {
+                console.error("Error fetching location data:", error);
+                alert("An error occurred while retrieving your location.");
+            }
+        }, (error) => {
+            console.error("Geolocation error:", error);
+            alert("Unable to access location. Please enable location services.");
+        });
+    } else {
+        alert("Geolocation is not supported by your browser.");
+    }
+}
+
+
+function useCurrentLocation2() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (position) => {
+            const { latitude, longitude } = position.coords;
+
+            // Reverse geocoding API request
+            const apiKey = "AIzaSyBuKitXZZvPXjHXVebv0bVBrEpdj4dFhH8"; // Replace with your API key
+            const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.results && data.results[0]) {
+                    const address = data.results[0].formatted_address; // Correct property
+                    document.getElementById("roadAddress").value = address;
+                } else {
+                    alert("Unable to fetch address. Please try again.");
+                }
+            } catch (error) {
+                console.error("Error fetching location data:", error);
+                alert("An error occurred while retrieving your location.");
+            }
+        }, (error) => {
+            console.error("Geolocation error:", error);
+            alert("Unable to access location. Please enable location services.");
+        });
+    } else {
+        alert("Geolocation is not supported by your browser.");
+    }
+}
+
+function useCurrentLocation3() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (position) => {
+            const { latitude, longitude } = position.coords;
+
+            // Reverse geocoding API request
+            const apiKey = "AIzaSyBuKitXZZvPXjHXVebv0bVBrEpdj4dFhH8"; // Replace with your API key
+            const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.results && data.results[0]) {
+                    const address = data.results[0].formatted_address; // Correct property
+                    document.getElementById("roadAddress2").value = address;
+                } else {
+                    alert("Unable to fetch address. Please try again.");
+                }
+            } catch (error) {
+                console.error("Error fetching location data:", error);
+                alert("An error occurred while retrieving your location.");
+            }
+        }, (error) => {
+            console.error("Geolocation error:", error);
+            alert("Unable to access location. Please enable location services.");
+        });
+    } else {
+        alert("Geolocation is not supported by your browser.");
+    }
+}
 
 // Fetch stores from the database and display them immediately upon page load
 async function fetchStores() {
@@ -241,13 +356,11 @@ async function registerStore() {
     }
 }
 
-
 function clearStoreForm() {
     document.getElementById("storeName").value = "";
     document.getElementById("storeAddress").value = "";
     document.getElementById("storeHours").value = "";
     document.getElementById("contactNumber").value = "";
-
 }
 
 window.onload = fetchStores;
@@ -409,121 +522,114 @@ function displayStores(stores) {
 async function fetchSupplies() {
     const token = localStorage.getItem('authToken');
     if (!token) {
-        alert('No token found, please log in again.');
+        console.log('No token found, please log in again.');
         return;
     }
 
-    try {
-        const response = await fetch(`${apiBaseUrl}/get-supplies`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-        });
+    const response = await fetch(`${apiBaseUrl}/get-supplies`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+    });
 
-        const data = await response.json();
+    const data = await response.json();
 
-        if (response.ok) {
-            const map = L.map('map').setView([13.7565, 121.0583], 13);
+    if (response.ok) {
+        const map = L.map('map').setView([13.7565, 121.0583], 13);
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
 
-            const suppliesList = document.getElementById('supplies-list');
-            suppliesList.innerHTML = '';
+        const suppliesList = document.getElementById('supplies-list');
+        suppliesList.innerHTML = '';
 
-            const markerMap = {}; // Map to store markers by supply ID or some unique property
+        const markerMap = {}; // Map to store markers by supply ID or some unique property
 
-            // Sort data by supply type (e.g., by _id)
-            data.sort((a, b) => a._id.localeCompare(b._id));
+        // Sort data by supply type (e.g., by _id)
+        data.sort((a, b) => a._id.localeCompare(b._id));
 
-            data.forEach(supplyType => {
-                const supplyContainer = document.createElement('div');
-                supplyContainer.classList.add('supply-container');
+        data.forEach(supplyType => {
+            const supplyContainer = document.createElement('div');
+            supplyContainer.classList.add('supply-container');
 
-                const typeHeader = document.createElement('h2');
-                typeHeader.textContent = `${supplyType._id} Supply`;
-                supplyContainer.appendChild(typeHeader);
+            const typeHeader = document.createElement('h2');
+            typeHeader.textContent = `${supplyType._id} Supply`;
+            supplyContainer.appendChild(typeHeader);
 
-                // Sort supplies by name
-                supplyType.supplies.sort((a, b) => {
-                    const nameA = a.name || ''; // Handle missing names
-                    const nameB = b.name || '';
-                    return nameA.localeCompare(nameB);
-                });
-
-                supplyType.supplies.forEach(supply => {
-                    const supplyItem = document.createElement('div');
-                    supplyItem.classList.add('supply-item');
-
-                    const name = document.createElement('div');
-                    name.classList.add('address-column');
-                    name.textContent = supply.name || "No Name Available";
-
-                    const availability = document.createElement('div');
-                    availability.classList.add('availability-column');
-
-                    switch (supply.supplyStatus) {
-                        case 'Available':
-                            availability.textContent = supply.supplyStatus;
-                            availability.style.color = 'green';
-                            break;
-                        case 'Limited':
-                            availability.textContent = supply.supplyStatus;
-                            availability.style.color = 'orange';
-                            break;
-                        case 'Out Of Stock':
-                            availability.textContent = supply.supplyStatus;
-                            availability.style.color = 'red';
-                            break;
-                        default:
-                            availability.textContent = 'Status Unknown';
-                            availability.style.color = 'gray';
-                            break;
-                    }
-
-                    supplyItem.appendChild(name);
-                    supplyItem.appendChild(availability);
-                    supplyContainer.appendChild(supplyItem);
-
-                    if (supply.latitude && supply.longitude) {
-                        const latLng = [supply.latitude, supply.longitude];
-                        const markerIcon = createCustomMarker(supplyType._id);
-
-                        const marker = L.marker(latLng, { icon: markerIcon }).addTo(map);
-
-                        const popupContent = `
-                            <div class="popup-content">
-                                <b>Store Name:</b> ${supply.name || "No Name Available"}<br>
-                                <b>Status:</b> ${supply.supplyStatus}<br>
-                                <b>Location:</b> Latitude: ${supply.latitude}, Longitude: ${supply.longitude}<br>
-                                <b>Supply Type:</b> ${supplyType._id}
-                            </div>
-                        `;
-                        marker.bindPopup(popupContent);
-
-                        // Save marker reference
-                        markerMap[supply.name] = marker;
-
-                        // Add click event to supply item
-                        supplyItem.addEventListener('click', () => {
-                            map.setView(latLng, 15); // Pan and zoom to marker
-                            marker.openPopup(); // Open the popup
-                        });
-                    }
-                });
-
-                suppliesList.appendChild(supplyContainer);
+            // Sort supplies by name
+            supplyType.supplies.sort((a, b) => {
+                const nameA = a.name || ''; // Handle missing names
+                const nameB = b.name || '';
+                return nameA.localeCompare(nameB);
             });
 
-        } else {
-            alert('Failed to fetch supplies: ' + (data.error || 'Unknown error.'));
-        }
-    } catch (err) {
-        console.error('Error fetching supplies:', err);
-        alert('Error fetching supplies. Please try again.');
+            supplyType.supplies.forEach(supply => {
+                const supplyItem = document.createElement('div');
+                supplyItem.classList.add('supply-item');
+
+                const name = document.createElement('div');
+                name.classList.add('address-column');
+                name.textContent = supply.name || "No Name Available";
+
+                const availability = document.createElement('div');
+                availability.classList.add('availability-column');
+
+                switch (supply.supplyStatus) {
+                    case 'Available':
+                        availability.textContent = supply.supplyStatus;
+                        availability.style.color = 'green';
+                        break;
+                    case 'Limited':
+                        availability.textContent = supply.supplyStatus;
+                        availability.style.color = 'orange';
+                        break;
+                    case 'Out Of Stock':
+                        availability.textContent = supply.supplyStatus;
+                        availability.style.color = 'red';
+                        break;
+                    default:
+                        availability.textContent = 'Status Unknown';
+                        availability.style.color = 'gray';
+                        break;
+                }
+
+                supplyItem.appendChild(name);
+                supplyItem.appendChild(availability);
+                supplyContainer.appendChild(supplyItem);
+
+                if (supply.latitude && supply.longitude) {
+                    const latLng = [supply.latitude, supply.longitude];
+                    const markerIcon = createCustomMarker(supplyType._id);
+
+                    const marker = L.marker(latLng, { icon: markerIcon }).addTo(map);
+
+                    const popupContent = `
+                        <div class="popup-content">
+                            <b>Store Name:</b> ${supply.name || "No Name Available"}<br>
+                            <b>Status:</b> ${supply.supplyStatus}<br>
+                            <b>Location:</b> Latitude: ${supply.latitude}, Longitude: ${supply.longitude}<br>
+                            <b>Supply Type:</b> ${supplyType._id}
+                        </div>
+                    `;
+                    marker.bindPopup(popupContent);
+
+                    // Save marker reference
+                    markerMap[supply.name] = marker;
+
+                    // Add click event to supply item
+                    supplyItem.addEventListener('click', () => {
+                        map.setView(latLng, 15); // Pan and zoom to marker
+                        marker.openPopup(); // Open the popup
+                    });
+                }
+            });
+
+            suppliesList.appendChild(supplyContainer);
+        });
+
     }
 }
 
@@ -555,6 +661,62 @@ function createCustomMarker(status) {
         iconAnchor: [12, 41],
         popupAnchor: [1, -34],
     });
+}
+
+
+
+function clearClosure() {
+    document.getElementById("reporterName").value = "";
+    document.getElementById("roadAddress").value = "";
+}
+
+async function submitRoadClosure(event) {
+    event.preventDefault();
+
+    const reporterName = document.getElementById('reporterName').value;
+    const roadAddress = document.getElementById('roadAddress').value;
+    const roadReason = document.querySelector('input[name="roadReason"]:checked')?.value;
+
+    if (!reporterName || !roadAddress || !roadReason) {
+        alert('Please fill out all fields!');
+        return;
+    }
+
+    // Ensure you have the token before proceeding
+    if (!token) {
+        alert("Please log in first.");
+        return;
+    }
+
+    // Prepare the data to be sent to the server
+    const reportData = {
+        reporterName,
+        roadAddress,
+        roadReason
+    };
+
+    try {
+        const response = await fetch(`${apiBaseUrl}/api/report-road-closure`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(reportData)
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert('Road closure report submitted successfully!');
+            clearClosure();
+        } else {
+            alert('Error submitting report: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error submitting road closure report:', error);
+        alert('There was an error submitting your report');
+    }
 }
 
 
