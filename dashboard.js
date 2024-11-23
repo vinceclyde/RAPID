@@ -303,6 +303,32 @@ function displayStores(stores) {
     });
 }
 
+// Store the selected store ID for update purposes
+let selectedStoreId = null; 
+
+function toggleButton(isUpdate) {
+    const submitButton = document.querySelector(".submitButton");
+    if (isUpdate) {
+        submitButton.textContent = "UPDATE"; // Change button text to UPDATE
+        submitButton.setAttribute("onclick", "updateStore()"); // Attach update function
+    } else {
+        submitButton.textContent = "REGISTER"; // Change button text to REGISTER
+        submitButton.setAttribute("onclick", "registerStore()"); // Attach register function
+    }
+}
+
+function clearStoreForm() {
+    document.getElementById("storeName").value = "";
+    document.getElementById("storeAddress").value = "";
+    document.getElementById("storeHours").value = "";
+    document.getElementById("contactNumber").value = "";
+
+
+    selectedStoreId = null; // Clear the selected store ID
+    toggleButton(false); // Reset button to REGISTER mode
+}
+
+
 // Register store function
 async function registerStore() {
     if (!token) {
@@ -314,11 +340,11 @@ async function registerStore() {
     const storeAddress = document.getElementById("storeAddress").value;
     const storeHours = document.getElementById("storeHours").value;
     const contactNumber = document.getElementById("contactNumber").value;
-    const supplyType = document.querySelector('input[name="supplyType"]:checked').value || "";
-    const supplyStatus = document.querySelector('input[name="supplyStatus"]:checked').value || "";
+    const supplyType = document.querySelector('input[name="supplyType"]:checked')?.value || "";
+    const supplyStatus = document.querySelector('input[name="supplyStatus"]:checked')?.value || "";
 
-    if (!selectedLatitude || !selectedLongitude) {
-        alert("Please select a valid address from the suggestions.");
+    if (!storeName || !storeAddress || !storeHours || !contactNumber) {
+        alert("Please fill in all the fields.");
         return;
     }
 
@@ -329,16 +355,16 @@ async function registerStore() {
         contact: contactNumber,
         supplyType,
         supplyStatus,
-        latitude: selectedLatitude, // Send latitude
-        longitude: selectedLongitude // Send longitude
+        latitude: selectedLatitude,
+        longitude: selectedLongitude
     };
 
     try {
         const response = await fetch(`${apiBaseUrl}/register-store`, {
-            method: 'POST',
+            method: "POST",
             headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
             },
             body: JSON.stringify(store)
         });
@@ -346,29 +372,24 @@ async function registerStore() {
         const data = await response.json();
         if (data.message) {
             alert(data.message);
-            fetchStores(); // Refresh the stores list
-            clearStoreForm(); // Clear the form after submission
+
+            fetchStores(); // Refresh the store list
+            clearStoreForm(); // Reset the form and button to default state
         } else {
-            console.error('Error registering store:', data);
+            console.error("Error registering store:", data.error || "Unknown error");
         }
     } catch (error) {
-        console.error('Error during store registration:', error);
+        console.error("Error during store registration:", error);
     }
 }
 
-function clearStoreForm() {
-    document.getElementById("storeName").value = "";
-    document.getElementById("storeAddress").value = "";
-    document.getElementById("storeHours").value = "";
-    document.getElementById("contactNumber").value = "";
-}
+
 
 window.onload = fetchStores;
 document.addEventListener('DOMContentLoaded', function () {
     fetchStores();  // Fetch stores when the page loads
 });
-// Store the selected store ID for update purposes
-let selectedStoreId = null;
+
 
 async function deleteStore() {
     const selectedStoreId = document.querySelector('input[name="selectedStore"]:checked')?.value;
@@ -400,56 +421,61 @@ async function deleteStore() {
 
 
 async function prepareUpdate() {
-    let selectedStoreId = document.querySelector('input[name="selectedStore"]:checked')?.value;
-    if (!selectedStoreId) {
-        alert("Please select a store to update.");
+    const selectedId = document.querySelector('input[name="selectedStore"]:checked')?.value;
+    if (!selectedId) {
+        alert("Please select a store to edit.");
         return;
     }
 
     try {
-        const response = await fetch(`${apiBaseUrl}/get-store/${selectedStoreId}`, {
-            method: 'GET',
+        const response = await fetch(`${apiBaseUrl}/get-store/${selectedId}`, {
+            method: "GET",
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-        });   
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+        });
         const store = await response.json();
 
         if (store) {
-            // Pre-fill the form with store details for update
+            // Pre-fill form fields
             document.getElementById("storeName").value = store.name;
             document.getElementById("storeAddress").value = store.address;
             document.getElementById("storeHours").value = store.hours;
             document.getElementById("contactNumber").value = store.contact;
-
             document.querySelector(`input[name="supplyType"][value="${store.supplyType}"]`).checked = true;
             document.querySelector(`input[name="supplyStatus"][value="${store.supplyStatus}"]`).checked = true;
 
-            // Store the selected store's ID globally
-            selectedStoreId = store._id;
+            selectedStoreId = store._id; // Set the selected store ID globally
+
+            // Toggle button to UPDATE mode
+            toggleButton(true);
         } else {
-            console.error("Store not found for update.");
+            console.error("Store not found.");
         }
     } catch (error) {
         console.error("Error fetching store details:", error);
     }
 }
 
-
 async function updateStore() {
-    const selectedStoreId = document.querySelector('input[name="selectedStore"]:checked')?.value;
     if (!selectedStoreId) {
-        alert("Please select a store to update.");
+        alert("No store selected for update.");
         return;
     }
 
+    // Collect store details
     const storeName = document.getElementById("storeName").value;
     const storeAddress = document.getElementById("storeAddress").value;
     const storeHours = document.getElementById("storeHours").value;
     const contactNumber = document.getElementById("contactNumber").value;
-    const supplyType = document.querySelector('input[name="supplyType"]:checked').value || "";
-    const supplyStatus = document.querySelector('input[name="supplyStatus"]:checked').value || "";
+    const supplyType = document.querySelector('input[name="supplyType"]:checked')?.value || "";
+    const supplyStatus = document.querySelector('input[name="supplyStatus"]:checked')?.value || "";
+
+    if (!storeName || !storeAddress || !storeHours || !contactNumber) {
+        alert("Please fill in all the fields.");
+        return;
+    }
 
     const store = {
         name: storeName,
@@ -458,16 +484,16 @@ async function updateStore() {
         contact: contactNumber,
         supplyType,
         supplyStatus,
-        latitude: selectedLatitude, // Updated latitude
-        longitude: selectedLongitude // Updated longitude
+        latitude: selectedLatitude,
+        longitude: selectedLongitude
     };
 
     try {
         const response = await fetch(`${apiBaseUrl}/update-store/${selectedStoreId}`, {
-            method: 'PUT',
+            method: "PUT",
             headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
             },
             body: JSON.stringify(store)
         });
@@ -475,25 +501,13 @@ async function updateStore() {
         const data = await response.json();
         if (data.message) {
             alert(data.message);
-
-            // Remove existing map instance
-            if (window.map) {
-                window.map.remove();
-            }
-
-            // Reinitialize map
-            initializeMap();
-
-            // Fetch and display updated stores
-            fetchStores();
-
-            // Clear the form
-            clearStoreForm();
+            fetchStores(); // Refresh the store list
+            clearStoreForm(); // Reset the form and button
         } else {
-            console.error('Error updating store:', data);
+            console.error("Error updating store:", data.error || "Unknown error");
         }
     } catch (error) {
-        console.error('Error during store update:', error);
+        console.error("Error during store update:", error);
     }
 }
 
