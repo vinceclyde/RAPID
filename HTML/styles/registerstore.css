@@ -190,6 +190,7 @@ body {
 
 .submitButton {
     margin-top: 20px;
+    width: 150px;
     font-family: 'Inter';
     padding: 10px 20px;
     font-size: 16px;
