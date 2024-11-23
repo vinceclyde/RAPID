@@ -361,6 +361,13 @@ function clearStoreForm() {
     document.getElementById("storeAddress").value = "";
     document.getElementById("storeHours").value = "";
     document.getElementById("contactNumber").value = "";
+
+    const supplyTypeRadios = document.querySelectorAll('input[name="supplyType"]');
+    supplyTypeRadios.forEach(radio => radio.checked = false);
+
+    // Clear radio buttons for supplyStatus
+    const supplyStatusRadios = document.querySelectorAll('input[name="supplyStatus"]');
+    supplyStatusRadios.forEach(radio => radio.checked = false);
 }
 
 window.onload = fetchStores;
@@ -547,7 +554,7 @@ function displayStores(stores) {
 async function fetchSupplies() {
     const token = localStorage.getItem('authToken');
     if (!token) {
-        console.log('No token found, please log in again.');
+        alert('No token found, please log in again.');
         return;
     }
 
@@ -573,24 +580,38 @@ async function fetchSupplies() {
 
         const markerMap = {}; // Map to store markers by supply ID or some unique property
 
-                        // Define icons for each supply type
-                        const iconMap = {
-                            Food: 'styles/assets/food_icon.png',
-                            Medical: 'styles/assets/medic_icon.png',
-                            Gas: 'styles/assets/gas_icon.png',
-                            Water: 'styles/assets/water_icon.png',
-                        };
-
-        // Sort data by supply type (e.g., by _id)
-        data.sort((a, b) => a._id.localeCompare(b._id));
+        // Define icons for each supply type
+        const iconMap = {
+            Food: 'styles/assets/food_icon.png',
+            Medical: 'styles/assets/medic_icon.png',
+            Gas: 'styles/assets/gas_icon.png',
+            Water: 'styles/assets/water_icon.png',
+        };
 
         data.forEach(supplyType => {
             const supplyContainer = document.createElement('div');
             supplyContainer.classList.add('supply-container');
 
-                const typeHeader = document.createElement('h2');
-                typeHeader.textContent = `${supplyType._id} Supply`;
-                supplyContainer.appendChild(typeHeader);
+            // Create a container for the header and image
+            const headerContainer = document.createElement('div');
+            headerContainer.classList.add('header-container');
+
+            // Create the image element
+            const typeImage = document.createElement('img');
+            typeImage.src = iconMap[supplyType._id] || 'assets/icons/default.png'; // Use default icon if not found
+            typeImage.alt = `${supplyType._id} Icon`;
+            typeImage.classList.add('supply-type-icon');
+
+            // Create the header
+            const typeHeader = document.createElement('h2');
+            typeHeader.textContent = `${supplyType._id} Supply`;
+
+            // Append the image and header to the container
+            headerContainer.appendChild(typeImage);
+            headerContainer.appendChild(typeHeader);
+
+            // Append the header container to the supply container
+            supplyContainer.appendChild(headerContainer);
 
             // Sort supplies by name
             supplyType.supplies.sort((a, b) => {
@@ -663,8 +684,11 @@ async function fetchSupplies() {
             suppliesList.appendChild(supplyContainer);
         });
 
+    } else {
+        alert('Failed to fetch supplies: ' + (data.error || 'Unknown error.'));
     }
 }
+
 
 //Dashboard map markers
 function createCustomMarker(status) {
@@ -743,9 +767,7 @@ async function submitRoadClosure(event) {
         if (data.success) {
             alert('Road closure report submitted successfully!');
             clearClosure();
-        } else {
-            alert('Error submitting report: ' + data.error);
-        }
+        } 
     } catch (error) {
         console.error('Error submitting road closure report:', error);
         alert('There was an error submitting your report');
