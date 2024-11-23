@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leaflet Road Closure</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/dashboard.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.css" />
     <style>
@@ -11,37 +15,87 @@
             height: 500px;
             width: 100%;
         }
-        .controls {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 1000;
-            background: white;
-            padding: 10px;
+        .submit-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
             border-radius: 5px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            margin-top: 20px;
         }
-        .controls button, .controls input {
-            margin: 5px 0;
-            width: 100%;
+
+        .submit-button:hover {
+            background-color: #45a049;
         }
+        .regStoreCon3 {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 15px;
+        height: 92.9vh;
+        width: 100%;
+        padding: 20px;
+        border: 1px solid black;
+    }
     </style>
 </head>
 <body>
-    <div class="controls">
-        <h3>Mark Closed Road</h3>
-        <label for="reporter">Reporter Name:</label>
-        <input type="text" id="reporter" placeholder="Enter your name">
-        <button id="clear-markers-btn">Clear Markers</button>
-        <button id="clear-roads-btn">Clear Roads</button>
+    <div class="container">
+        <div class="regStoreCon3">
+            <form id="roadClosure" onsubmit="submitRoadClosure(event)">
+                <label class="label" for="reporterName">Reporter's Name</label>
+                <input class="input" type="text" id="reporterName" required><br>
+
+                <label class="label" for="roadAddress">Starting Point</label>
+                <div class="addressCon">
+                    <input class="input" type="text" id="roadAddress" required>
+                    <button type="button" class="locationButton" onclick="useCurrentLocation2()">Use My Location</button>
+                </div>
+                <label class="label" for="start-coordinates">Coordinates</label>
+                <div class="addressCon">
+                    <input class="input" type="text" id="start-coordinates" required>
+                </div>
+                <label class="label" for="roadAddress2">Ending Point</label>
+                <div class="addressCon">
+                    <input class="input" type="text" id="roadAddress2" required>
+                    <button type="button" class="locationButton" onclick="useCurrentLocation3()">Use My Location</button>
+                    </div>
+                <label class="label" for="end-coordinates">Coordinates</label>
+                <div class="addressCon">
+                    <input class="input" type="text" id="end-coordinates" required>
+                </div>
+                <label class="label" for="roadAddress2">Ending Point</label>
+                <ul id="suggestions"></ul>
+
+                <div class="regStoreSubCon2">
+                    <fieldset class="supply">
+                        <legend>Reason for Closure:</legend>
+                        <label><input type="radio" name="roadReason" value="Vehicular Accident"> Vehicular Accident</label><br>
+                        <label><input type="radio" name="roadReason" value="Landslide/Rock Slide"> Landslide/Rock Slide</label><br>
+                        <label><input type="radio" name="roadReason" value="Road Maintenance"> Road Maintenance</label><br>
+                        <label><input type="radio" name="roadReason" value="Electrical Repair"> Electrical Repair</label><br>
+                        <label><input type="radio" name="roadReason" value="Flooding"> Flooding</label><br>
+                    </fieldset><br>
+                </form>
+                </div>
+                <div class="centerDiv">
+                <button type="submit" class="submitButton">Submit Report</button>
+                <button type="submit" id="clear-roads-btn" class="submitButton">Clear Roads</button>
+                <button type="submit" id="clear-markers-btn" class="submitButton">Clear Markers</button>
+                </div>
+            </div>
+        </div>
     </div>
+
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.min.js"></script>
 
     <script>
-        // Initialize the map
         const map = L.map('map').setView([14.5995, 120.9842], 13); // Centered on Manila, Philippines
 
         // Add OpenStreetMap tile layer
@@ -49,22 +103,46 @@
             maxZoom: 19,
         }).addTo(map);
 
-        let routingControl = null; // To store routing control
-        let markers = [];
+        let routingControl = null;
+        let startMarker = null;
+        let endMarker = null;
+
         const clearMarkersBtn = document.getElementById('clear-markers-btn');
         const clearRoadsBtn = document.getElementById('clear-roads-btn');
-        const reporterInput = document.getElementById('reporter');
+        const startAddressInput = document.getElementById('roadAddress');
+        const endAddressInput = document.getElementById('roadAddress2');
+        const startCoordinatesInput = document.getElementById('start-coordinates');
+        const endCoordinatesInput = document.getElementById('end-coordinates');
 
-        // Handle map click to add markers
-        map.on('click', (e) => {
-            const marker = L.marker(e.latlng).addTo(map);
-            markers.push(marker);
+        // Helper function to reverse geocode coordinates
+        async function reverseGeocode(lat, lon) {
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+            const data = await response.json();
+            if (data && data.display_name) {
+                return data.display_name;
+            }
+            return "Unknown location";
+        }
 
-            if (markers.length === 2) {
-                const start = markers[0].getLatLng();
-                const end = markers[1].getLatLng();
+        // Handle map clicks to set start and end points
+        map.on('click', async (e) => {
+            const { lat, lng } = e.latlng;
 
-                // Add routing control to follow roads
+            if (!startMarker) {
+                startMarker = L.marker([lat, lng]).addTo(map).bindPopup('Starting Point').openPopup();
+                const address = await reverseGeocode(lat, lng);
+                startAddressInput.value = address;
+                startCoordinatesInput.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            } else if (!endMarker) {
+                endMarker = L.marker([lat, lng]).addTo(map).bindPopup('Ending Point').openPopup();
+                const address = await reverseGeocode(lat, lng);
+                endAddressInput.value = address;
+                endCoordinatesInput.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+                // Add routing control to mark the road as closed
+                const start = startMarker.getLatLng();
+                const end = endMarker.getLatLng();
+
                 if (routingControl) {
                     map.removeControl(routingControl);
                 }
@@ -76,20 +154,26 @@
                         styles: [{ color: 'red', weight: 4 }]
                     }
                 }).addTo(map);
-
-                // Clear markers
-                markers.forEach(m => map.removeLayer(m));
-                markers = [];
-                const reporter = reporterInput.value.trim();
-                alert(`Road marked as closed by ${reporter || 'Anonymous'}!`);
+            } else {
+                alert('Clear the existing markers to set new points.');
             }
         });
 
         // Clear markers
         clearMarkersBtn.addEventListener('click', () => {
-            markers.forEach(marker => map.removeLayer(marker));
-            markers = [];
-            alert('All markers cleared.');
+            if (startMarker) {
+                map.removeLayer(startMarker);
+                startMarker = null;
+                startAddressInput.value = '';
+                startCoordinatesInput.value = '';
+            }
+            if (endMarker) {
+                map.removeLayer(endMarker);
+                endMarker = null;
+                endAddressInput.value = '';
+                endCoordinatesInput.value = '';
+            }
+            alert('Markers cleared.');
         });
 
         // Clear all routes
