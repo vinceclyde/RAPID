@@ -11,6 +11,7 @@ body {
 .title {
     font-family: 'Inter', sans-serif;
     color: #f4976c;
+    font-weight: bold;
     font-size: clamp(1.5rem, 2vw + 1rem, 2rem);
 }
 

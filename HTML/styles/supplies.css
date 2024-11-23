@@ -26,6 +26,19 @@ body {
     max-height: 80vh; /* Optional: set a max height to control how tall the container can be */
 }
 
+.header-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;/* Vertically cent er the content */
+    gap: 10px; /* Space between the image and the header */
+}
+
+.supply-type-icon {
+    width: 40px;
+    height: 40px;
+    object-fit: contain; 
+}
+
 
 @keyframes fadeIn {
     from {
@@ -173,12 +186,11 @@ h2 {
 }
 
 .popup-content b {
-    color: #007bff;
+    color: #303C6C;
 }
 
 .popup-content br {
     margin-bottom: 5px;
 }
-
 
 

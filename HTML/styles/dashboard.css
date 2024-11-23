@@ -7,39 +7,41 @@ body {
 }
 
 .navBar {
-    width: 15%;
+    width: clamp(10%, 15%, 20%); 
     display: flex;
     flex-direction: column;
+    row-gap: 20px;
     background-color: #303c6c;
+    border: 2px solid #f4976c;
     border-radius: 0px 35px 35px 0px;
     height: 94.9vh;
     padding: 30px 0 0px 20px;
-    transform: translateX(-100%); 
-    animation: slideIn 1s ease-out forwards; 
-    transition:width 3s ease-in-out; 
+    transform: translateX(-100%);
+    animation: slideIn 1s ease-out forwards;
+    transition: width 3s ease-in-out;
 }
 
 @keyframes slideIn {
     from {
         transform: translateX(-100%);
-        opacity: 0; /* Start invisible */
+        opacity: 0; 
     }
     to {
         transform: translateX(0);
-        opacity: 1; /* Fully visible */
+        opacity: 1; 
     }
 }
 
 .navBarRAPID {
     font-family: 'Inter';
-    font-size: 24px;
+    font-size: clamp(18px, 2vw + 10px, 24px); 
     color: #f4976c;
     font-weight: 600;
 }
 
 .navBarText {
     font-family: 'Inter';
-    font-size: 16px;
+    font-size: clamp(14px, 1.5vw + 10px, 16px);
     color: #f4976c;
     font-weight: 600;
     cursor: pointer;
@@ -65,6 +67,7 @@ body {
     height: 25px;
     transition: transform 0.3s ease;
 }
+
 .icon:hover {
     transform: scale(1.4);
 }
@@ -134,11 +137,11 @@ body {
     display: flex;
     flex-direction: column;
     width: 90%;
-    height: 40vh; /* Adjust to a percentage of the viewport height */
+    height: 40vh; 
     border-radius: 15px;
     border: solid black 1.5px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-    overflow: auto; /* Show scrollbars when content overflows */
+    overflow: auto;
 }
 
 
@@ -261,6 +264,10 @@ body {
 }
 
 @media (max-width: 600px) {
+    .navBar {
+        width: 15%;
+    }
+
     .navBarText {
         display: flex;
         align-items: center;
@@ -272,13 +279,20 @@ body {
 
     .icon {
         display: inline-block;
-        width: 24px;
-        height: 24px;
+        width: 20px;
+        height: 20px;
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center;
     }
-
+    
+    .iconDiv {
+        display: flex;
+        flex-direction: column;
+        margin-top: auto;
+        margin-bottom: 30px;
+        gap: 20px;
+    }
     /* Custom icons for each item */
     #dashboard .icon {
         background-image: url('assets/dashboard.png');

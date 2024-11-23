@@ -502,23 +502,48 @@ async function updateStore() {
 function displayStores(stores) {
     const storeList = document.getElementById("storeList");
     storeList.innerHTML = ""; // Clear the existing list
+
+    if (stores.length === 0) {
+        storeList.innerHTML = "<p>No registered stores available.</p>";
+        return;
+    }
+
+    // Create table and headers
+    const table = document.createElement("table");
+    table.classList.add("store-table");
+
+    const headerRow = document.createElement("tr");
+    headerRow.innerHTML = `
+        <th>Select</th>
+        <th>Store Name</th>
+        <th>Address</th>
+        <th>Hours</th>
+        <th>Contact</th>
+        <th>Supply Type</th>
+        <th>Supply Status</th>
+    `;
+    
+    table.appendChild(headerRow);
+
     stores.forEach(store => {
-        const storeInfo = document.createElement("div");
-        storeInfo.innerHTML = `
-            <input type="radio" name="selectedStore" value="${store._id}" id="store-${store._id}">
-            <label for="store-${store._id}">
-                <strong>${store.name}</strong><br>
-                Address: ${store.address}<br>
-                Hours: ${store.hours}<br>
-                Contact: ${store.contact}<br>
-                Supply Type: ${store.supplyType}<br>
-                Supply Status: ${store.supplyStatus}<br>
-            </label>
-            <hr>
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td><input type="radio" name="selectedStore" value="${store._id}" id="store-${store._id}"></td>
+            <td>${store.name}</td>
+            <td>${store.address}</td>
+            <td>${store.hours}</td>
+            <td>${store.contact}</td>
+            <td>${store.supplyType}</td>
+            <td>${store.supplyStatus}</td>
         `;
-        storeList.appendChild(storeInfo);
+
+        table.appendChild(row);
     });
+
+    storeList.appendChild(table);
 }
+
 async function fetchSupplies() {
     const token = localStorage.getItem('authToken');
     if (!token) {
@@ -548,6 +573,14 @@ async function fetchSupplies() {
 
         const markerMap = {}; // Map to store markers by supply ID or some unique property
 
+                        // Define icons for each supply type
+                        const iconMap = {
+                            Food: 'styles/assets/food_icon.png',
+                            Medical: 'styles/assets/medic_icon.png',
+                            Gas: 'styles/assets/gas_icon.png',
+                            Water: 'styles/assets/water_icon.png',
+                        };
+
         // Sort data by supply type (e.g., by _id)
         data.sort((a, b) => a._id.localeCompare(b._id));
 
@@ -555,9 +588,9 @@ async function fetchSupplies() {
             const supplyContainer = document.createElement('div');
             supplyContainer.classList.add('supply-container');
 
-            const typeHeader = document.createElement('h2');
-            typeHeader.textContent = `${supplyType._id} Supply`;
-            supplyContainer.appendChild(typeHeader);
+                const typeHeader = document.createElement('h2');
+                typeHeader.textContent = `${supplyType._id} Supply`;
+                supplyContainer.appendChild(typeHeader);
 
             // Sort supplies by name
             supplyType.supplies.sort((a, b) => {
@@ -633,33 +666,33 @@ async function fetchSupplies() {
     }
 }
 
-
+//Dashboard map markers
 function createCustomMarker(status) {
-    let markerColor;
+    let iconUrl;
 
     switch (status) {
         case 'Food':
-            markerColor = 'green';
+            iconUrl = 'styles/assets/food_icon.png';  
             break;
-        case 'Medicine':
-            markerColor = 'yellow';
+        case 'Medical':
+            iconUrl = 'styles/assets/medic_icon.png';  
             break;
         case 'Gas':
-            markerColor = 'red';
+            iconUrl = 'styles/assets/gas_icon.png';  
             break;
         case 'Water':
-            markerColor = 'blue';
+            iconUrl = 'styles/assets/water_icon.png';  
             break;
         default:
-            markerColor = 'black';
+            iconUrl = 'styles/assets/black.png';  
             break;
     }
 
     return new L.Icon({
-        iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${markerColor}.png`,
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
+        iconUrl: iconUrl,
+        iconSize: [40, 40], 
+        iconAnchor: [20, 40],  
+        popupAnchor: [0, -40],  // Adjust for the popup positio
     });
 }
 
