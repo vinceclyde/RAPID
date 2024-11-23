@@ -11,10 +11,16 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.css" />
     <style>
-        #map {
-            height: 500px;
-            width: 100%;
-        }
+        body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #f8f9fa;
+    gap: 10px;
+}
         .submit-button {
             background-color: #4CAF50;
             color: white;
@@ -35,15 +41,14 @@
         align-items: center;
         justify-content: center;
         border-radius: 15px;
-        height: 92.9vh;
-        width: 100%;
+        height: 88vh;
+        width: auto;
         padding: 20px;
-        border: 1px solid black;
+        border: 1.5px solid black;
     }
     </style>
 </head>
 <body>
-    <div class="container">
         <div class="regStoreCon3">
             <form id="roadClosure" onsubmit="submitRoadClosure(event)">
                 <label class="label" for="reporterName">Reporter's Name</label>
@@ -54,20 +59,11 @@
                     <input class="input" type="text" id="roadAddress" required>
                     <button type="button" class="locationButton" onclick="useCurrentLocation2()">Use My Location</button>
                 </div>
-                <label class="label" for="start-coordinates">Coordinates</label>
-                <div class="addressCon">
-                    <input class="input" type="text" id="start-coordinates" required>
-                </div>
                 <label class="label" for="roadAddress2">Ending Point</label>
                 <div class="addressCon">
                     <input class="input" type="text" id="roadAddress2" required>
                     <button type="button" class="locationButton" onclick="useCurrentLocation3()">Use My Location</button>
                     </div>
-                <label class="label" for="end-coordinates">Coordinates</label>
-                <div class="addressCon">
-                    <input class="input" type="text" id="end-coordinates" required>
-                </div>
-                <label class="label" for="roadAddress2">Ending Point</label>
                 <ul id="suggestions"></ul>
 
                 <div class="regStoreSubCon2">
@@ -79,24 +75,25 @@
                         <label><input type="radio" name="roadReason" value="Electrical Repair"> Electrical Repair</label><br>
                         <label><input type="radio" name="roadReason" value="Flooding"> Flooding</label><br>
                     </fieldset><br>
-                </form>
                 </div>
-                <div class="centerDiv">
-                <button type="submit" class="submitButton">Submit Report</button>
-                <button type="submit" id="clear-roads-btn" class="submitButton">Clear Roads</button>
-                <button type="submit" id="clear-markers-btn" class="submitButton">Clear Markers</button>
+                <div class="centerDiv2">
+                    <button type="submit" id="clear-roads-btn" class="submitButton">Clear Roads</button>
+                    <button type="submit" id="clear-markers-btn" class="submitButton">Clear Markers</button>
+                    <button type="submit" class="submitButton">Submit Report</button>
                 </div>
-            </div>
+            </form>
         </div>
-    </div>
+    
 
-    <div id="map"></div>
+
+
+    <div class="MapContainerBig" id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.min.js"></script>
 
     <script>
-        const map = L.map('map').setView([14.5995, 120.9842], 13); // Centered on Manila, Philippines
+        const map = L.map('map').setView([13.7565, 121.0583], 13); // Centered on Manila, Philippines
 
         // Add OpenStreetMap tile layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -132,12 +129,10 @@
                 startMarker = L.marker([lat, lng]).addTo(map).bindPopup('Starting Point').openPopup();
                 const address = await reverseGeocode(lat, lng);
                 startAddressInput.value = address;
-                startCoordinatesInput.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
             } else if (!endMarker) {
                 endMarker = L.marker([lat, lng]).addTo(map).bindPopup('Ending Point').openPopup();
                 const address = await reverseGeocode(lat, lng);
                 endAddressInput.value = address;
-                endCoordinatesInput.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
 
                 // Add routing control to mark the road as closed
                 const start = startMarker.getLatLng();
@@ -165,13 +160,11 @@
                 map.removeLayer(startMarker);
                 startMarker = null;
                 startAddressInput.value = '';
-                startCoordinatesInput.value = '';
             }
             if (endMarker) {
                 map.removeLayer(endMarker);
                 endMarker = null;
                 endAddressInput.value = '';
-                endCoordinatesInput.value = '';
             }
             alert('Markers cleared.');
         });
@@ -184,6 +177,227 @@
             }
             alert('All closed roads cleared.');
         });
+
+        function useCurrentLocation2() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (position) => {
+            const { latitude, longitude } = position.coords;
+
+            // Reverse geocoding API request
+            const apiKey = "AIzaSyBuKitXZZvPXjHXVebv0bVBrEpdj4dFhH8"; // Replace with your API key
+            const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.results && data.results[0]) {
+                    const address = data.results[0].formatted_address; // Correct property
+                    document.getElementById("roadAddress").value = address;
+                } else {
+                    alert("Unable to fetch address. Please try again.");
+                }
+
+                // Add a marker at the current location
+                if (startMarker) {
+                    map.removeLayer(startMarker); // Remove previous marker if exists
+                }
+                startMarker = L.marker([latitude, longitude]).addTo(map).bindPopup('Starting Point').openPopup();
+            } catch (error) {
+                console.error("Error fetching location data:", error);
+                alert("An error occurred while retrieving your location.");
+            }
+        }, (error) => {
+            console.error("Geolocation error:", error);
+            alert("Unable to access location. Please enable location services.");
+        });
+    } else {
+        alert("Geolocation is not supported by your browser.");
+    }
+}
+
+function useCurrentLocation3() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (position) => {
+            const { latitude, longitude } = position.coords;
+
+            // Reverse geocoding API request
+            const apiKey = "AIzaSyBuKitXZZvPXjHXVebv0bVBrEpdj4dFhH8"; // Replace with your API key
+            const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.results && data.results[0]) {
+                    const address = data.results[0].formatted_address; // Correct property
+                    document.getElementById("roadAddress2").value = address;
+                } else {
+                    alert("Unable to fetch address. Please try again.");
+                }
+
+                // Add a marker at the current location
+                if (endMarker) {
+                    map.removeLayer(endMarker); // Remove previous marker if exists
+                }
+                endMarker = L.marker([latitude, longitude]).addTo(map).bindPopup('Ending Point').openPopup();
+            } catch (error) {
+                console.error("Error fetching location data:", error);
+                alert("An error occurred while retrieving your location.");
+            }
+        }, (error) => {
+            console.error("Geolocation error:", error);
+            alert("Unable to access location. Please enable location services.");
+        });
+    } else {
+        alert("Geolocation is not supported by your browser.");
+    }
+}
+function setupAddressInput(inputId, suggestionsId, isStartPoint) {
+    const addressInput = document.getElementById(inputId);
+    const suggestionsList = document.getElementById(suggestionsId);
+
+    addressInput.addEventListener('input', async () => {
+        const query = addressInput.value.trim();
+
+        if (query.length < 3) {
+            suggestionsList.innerHTML = ''; // Clear suggestions if input is too short
+            suggestionsList.style.display = 'none'; // Hide suggestions
+            return;
+        }
+
+        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=5`;
+
+        try {
+            const response = await fetch(url);
+            const suggestions = await response.json();
+
+            suggestionsList.innerHTML = ''; // Clear previous suggestions
+
+            if (suggestions.length > 0) {
+                suggestionsList.style.display = 'block'; // Show suggestions if there are any
+            } else {
+                suggestionsList.style.display = 'none'; // Hide if no suggestions
+            }
+
+            suggestions.forEach((item) => {
+                const listItem = document.createElement('li');
+                listItem.textContent = item.display_name;
+
+                // Handle the click event on each suggestion
+                listItem.addEventListener('click', async () => {
+                    // Zoom into the selected suggestion on the map
+                    const lat = parseFloat(item.lat);
+                    const lon = parseFloat(item.lon);
+                    map.setView([lat, lon], 15); // Zoom to the location
+
+                    // Add a marker at the selected location
+                    if (isStartPoint) {
+                        if (startMarker) map.removeLayer(startMarker); // Remove previous start marker if exists
+                        startMarker = L.marker([lat, lon]).addTo(map).bindPopup('Starting Point').openPopup();
+                    } else {
+                        if (endMarker) map.removeLayer(endMarker); // Remove previous end marker if exists
+                        endMarker = L.marker([lat, lon]).addTo(map).bindPopup('Ending Point').openPopup();
+                    }
+
+                    // Set the selected address in the input field
+                    addressInput.value = item.display_name;
+
+                    // Clear the suggestions list and hide it
+                    suggestionsList.innerHTML = '';
+                    suggestionsList.style.display = 'none';
+
+                    // Check if both points are filled
+                    if (startMarker && endMarker) {
+                        const start = startMarker.getLatLng();
+                        const end = endMarker.getLatLng();
+
+                        if (routingControl) {
+                            map.removeControl(routingControl); // Remove existing route control
+                        }
+
+                        routingControl = L.Routing.control({
+                            waypoints: [start, end],
+                            createMarker: () => null, // Do not add default routing markers
+                            lineOptions: {
+                                styles: [{ color: 'red', weight: 4 }],
+                            },
+                        }).addTo(map);
+                    }
+                });
+
+                suggestionsList.appendChild(listItem);
+            });
+        } catch (error) {
+            console.error('Error fetching suggestions:', error);
+            suggestionsList.style.display = 'none'; // Hide suggestions if there's an error
+        }
+    });
+}
+
+// Call the function for both address inputs
+setupAddressInput('roadAddress', 'suggestions', true); // Starting point
+setupAddressInput('roadAddress2', 'suggestions', false); // Ending point
+
+async function submitRoadClosure(event) {
+    event.preventDefault(); // Prevent the form from reloading the page
+
+    const reporterName = document.getElementById('reporterName').value.trim();
+    const roadAddress = document.getElementById('roadAddress').value.trim();
+    const roadAddress2 = document.getElementById('roadAddress2').value.trim();
+    const roadReason = document.querySelector('input[name="roadReason"]:checked')?.value;
+
+    // Validate required fields
+    if (!reporterName || !roadAddress || !roadAddress2 || !roadReason) {
+        alert('Please fill out all fields and select a reason for closure.');
+        return;
+    }
+
+    const startCoordinates = startMarker ? startMarker.getLatLng() : null;
+    const endCoordinates = endMarker ? endMarker.getLatLng() : null;
+
+    if (!startCoordinates || !endCoordinates) {
+        alert('Please set both starting and ending points on the map.');
+        return;
+    }
+
+    const data = {
+        reporterName,
+        roadAddress,
+        roadAddress2,
+        roadReason,
+        startCoordinates: { lat: startCoordinates.lat, lng: startCoordinates.lng },
+        endCoordinates: { lat: endCoordinates.lat, lng: endCoordinates.lng },
+    };
+
+    try {
+        const response = await fetch('http://localhost:5000/api/report-road-closure', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+});
+
+        const result = await response.json();
+        if (response.ok) {
+            alert('Road closure report submitted successfully!');
+            // Optionally reset the form and map markers
+            document.getElementById('roadClosure').reset();
+            if (startMarker) map.removeLayer(startMarker);
+            if (endMarker) map.removeLayer(endMarker);
+            if (routingControl) map.removeControl(routingControl);
+            startMarker = null;
+            endMarker = null;
+            routingControl = null;
+        } else {
+            alert(`Error: ${result.error}`);
+        }
+    } catch (error) {
+        console.error('Error submitting road closure:', error);
+        alert('An error occurred while submitting the report. Please try again.');
+    }
+}
+
+
     </script>
 </body>
 </html>

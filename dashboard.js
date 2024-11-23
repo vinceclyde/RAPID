@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     document.getElementById("roadClosure").addEventListener("click", () => {
-        window.open("road-closure.html", "_blank"); // Opens the page in a new tab
+        window.open("roads.html", "_blank"); // Opens the page in a new tab
     });
     
     

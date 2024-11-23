@@ -258,20 +258,21 @@ app.delete('/delete-store/:id', authenticate, async (req, res) => {
 app.post('/api/report-road-closure', async (req, res) => {
     console.log('Request Body:', req.body);
 
-    const { reporterName, roadAddress, roadReason } = req.body;
+    const { reporterName, roadAddress, roadAddress2, roadReason, startCoordinates, endCoordinates } = req.body;
 
-    // Check if required fields are provided
-    if (!reporterName || !roadAddress || !roadReason) {
-        return res.status(400).json({ error: 'All fields are required.' });
+    if (!reporterName || !roadAddress || !roadReason || !startCoordinates || !endCoordinates) {
+        return res.status(400).json({ error: 'All fields, including coordinates, are required.' });
     }
 
     try {
-        // Insert the data into MongoDB
         const reportData = {
             reporterName,
             roadAddress,
+            roadAddress2,
             roadReason,
-            createdAt: new Date()
+            startCoordinates,
+            endCoordinates,
+            createdAt: new Date(),
         };
 
         const result = await client.db('RAPID').collection('roadClosures').insertOne(reportData);
