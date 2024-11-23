@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet Road Closure</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.css" />
+    <style>
+        #map {
+            height: 500px;
+            width: 100%;
+        }
+        .controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        .controls button, .controls input {
+            margin: 5px 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h3>Mark Closed Road</h3>
+        <label for="reporter">Reporter Name:</label>
+        <input type="text" id="reporter" placeholder="Enter your name">
+        <button id="clear-markers-btn">Clear Markers</button>
+        <button id="clear-roads-btn">Clear Roads</button>
+    </div>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.min.js"></script>
+
+    <script>
+        // Initialize the map
+        const map = L.map('map').setView([14.5995, 120.9842], 13); // Centered on Manila, Philippines
+
+        // Add OpenStreetMap tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+
+        let routingControl = null; // To store routing control
+        let markers = [];
+        const clearMarkersBtn = document.getElementById('clear-markers-btn');
+        const clearRoadsBtn = document.getElementById('clear-roads-btn');
+        const reporterInput = document.getElementById('reporter');
+
+        // Handle map click to add markers
+        map.on('click', (e) => {
+            const marker = L.marker(e.latlng).addTo(map);
+            markers.push(marker);
+
+            if (markers.length === 2) {
+                const start = markers[0].getLatLng();
+                const end = markers[1].getLatLng();
+
+                // Add routing control to follow roads
+                if (routingControl) {
+                    map.removeControl(routingControl);
+                }
+
+                routingControl = L.Routing.control({
+                    waypoints: [start, end],
+                    createMarker: () => null, // Do not add default routing markers
+                    lineOptions: {
+                        styles: [{ color: 'red', weight: 4 }]
+                    }
+                }).addTo(map);
+
+                // Clear markers
+                markers.forEach(m => map.removeLayer(m));
+                markers = [];
+                const reporter = reporterInput.value.trim();
+                alert(`Road marked as closed by ${reporter || 'Anonymous'}!`);
+            }
+        });
+
+        // Clear markers
+        clearMarkersBtn.addEventListener('click', () => {
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+            alert('All markers cleared.');
+        });
+
+        // Clear all routes
+        clearRoadsBtn.addEventListener('click', () => {
+            if (routingControl) {
+                map.removeControl(routingControl);
+                routingControl = null;
+            }
+            alert('All closed roads cleared.');
+        });
+    </script>
+</body>
+</html>
