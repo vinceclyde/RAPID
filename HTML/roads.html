@@ -12,16 +12,20 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.css" />
     <style>
-        body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    font-family: 'Inter', sans-serif;
-    background-color: #f8f9fa;
-    gap: 10px;
-}
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+        background-color: #f8f9fa;
+        gap: 10px;
+        background-image: url("Wireframe-1.png");
+        background-size:     cover;                    
+        background-repeat:   no-repeat;
+        background-position: center center;
+        }
         .submit-button {
             background-color: #4CAF50;
             color: white;
@@ -46,10 +50,40 @@
         width: auto;
         padding: 20px;
         border: 1.5px solid black;
+        background-color: white;
     }
+    #startSuggestions, #endSuggestions {
+        display: none;
+        max-height: 200px;      
+        overflow-y: auto;       
+        background-color: #fff; 
+        border: 1px solid #ccc; 
+        border-radius: 4px;   
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        font-size: 14px;        
+        padding: 5px 0;        
+        position: absolute;   
+        z-index: 999;        
+        width: auto;           
+        left: 0;               
+        margin-top: 50px;
+    }
+    
+
+    #startSuggestions li, #endSuggestions li {
+    padding: 8px 10px;      /* Add padding around each suggestion */
+    cursor: pointer;       /* Change cursor to pointer to indicate clickable items */
+}
+
+#startSuggestions li:hover , #endSuggestions li:hover {
+    background-color: #f0f0f0; /* Optional: Highlight on hover */
+}
+
+    
     </style>
 </head>
 <body>
+    <div class="container">
         <div class="regStoreCon3">
             <form id="roadClosure" onsubmit="submitRoadClosure(event)">
                 <label class="label" for="reporterName">Reporter's Name</label>
@@ -59,14 +93,16 @@
                 <div class="addressCon">
                     <input class="input" type="text" id="roadAddress" required>
                     <button type="button" class="locationButton" onclick="useCurrentLocation2()">Use My Location</button>
+                    <ul id="startSuggestions"></ul>
+
                 </div>
                 <label class="label" for="roadAddress2">Ending Point</label>
                 <div class="addressCon">
                     <input class="input" type="text" id="roadAddress2" required>
                     <button type="button" class="locationButton" onclick="useCurrentLocation3()">Use My Location</button>
-                    </div>
-                <ul id="suggestions"></ul>
+                    <ul id="endSuggestions"></ul>
 
+                    </div>
                 <div class="regStoreSubCon2">
                     <fieldset class="supply">
                         <legend>Reason for Closure:</legend>
@@ -78,8 +114,8 @@
                     </fieldset><br>
                 </div>
                 <div class="centerDiv2">
-                    <button type="submit" id="clear-roads-btn" class="submitButton">Clear Roads</button>
-                    <button type="submit" id="clear-markers-btn" class="submitButton">Clear Markers</button>
+                    <div id="clear-roads-btn" class="submitButton">Clear Roads</div>
+                    <div  id="clear-markers-btn" class="submitButton">Clear Markers</div>
                     <button type="submit" class="submitButton">Submit Report</button>
                 </div>
             </form>
@@ -89,12 +125,13 @@
 
 
     <div class="MapContainerBig" id="map"></div>
+</div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.min.js"></script>
 
     <script>
-        const map = L.map('map').setView([13.7565, 121.0583], 13); // Centered on Manila, Philippines
+        const map = L.map('map').setView([13.7565, 121.0583], 13);
 
         // Add OpenStreetMap tile layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -155,20 +192,23 @@
             }
         });
 
-        // Clear markers
-        clearMarkersBtn.addEventListener('click', () => {
-            if (startMarker) {
-                map.removeLayer(startMarker);
-                startMarker = null;
-                startAddressInput.value = '';
-            }
-            if (endMarker) {
-                map.removeLayer(endMarker);
-                endMarker = null;
-                endAddressInput.value = '';
-            }
-            alert('Markers cleared.');
-        });
+       // Correcting the marker clearing functionality
+clearMarkersBtn.addEventListener('click', () => {
+    if (startMarker) {
+        map.removeLayer(startMarker); // Remove the start marker
+        startMarker = null;
+    }
+    if (endMarker) {
+        map.removeLayer(endMarker); // Remove the end marker
+        endMarker = null;
+    }
+    if (routingControl) {
+        map.removeControl(routingControl); // Remove the routing control
+        routingControl = null;
+    }
+    alert('Markers cleared.');
+});
+
 
         // Clear all routes
         clearRoadsBtn.addEventListener('click', () => {
@@ -335,8 +375,9 @@ function setupAddressInput(inputId, suggestionsId, isStartPoint) {
 }
 
 // Call the function for both address inputs
-setupAddressInput('roadAddress', 'suggestions', true); // Starting point
-setupAddressInput('roadAddress2', 'suggestions', false); // Ending point
+setupAddressInput('roadAddress', 'startSuggestions', true); // Starting point
+setupAddressInput('roadAddress2', 'endSuggestions', false); // Ending point
+
 
 async function submitRoadClosure(event) {
     event.preventDefault(); // Prevent the form from reloading the page

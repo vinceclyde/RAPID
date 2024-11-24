@@ -80,7 +80,6 @@ body {
     align-items: center;
     width: 80vw;
     height: 94.9vh;
-    background-color: white;
     opacity: 0;
     animation: fadeIn 1s ease-out 0.5s forwards;
     gap: 10px;
@@ -215,6 +214,7 @@ body {
     color: white;
     cursor: pointer;
     transition: background-color 0.5s ease;
+    text-align: center;
 }
 
 .submitButton:hover {
@@ -353,6 +353,7 @@ body {
     width: 30%;
     padding: 5px;
     transition: background-color 0.5s ease;
+    cursor: pointer;
 }
 
 .locationButton:hover {

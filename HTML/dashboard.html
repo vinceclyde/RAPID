@@ -6,7 +6,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles/dashboard.css">
     <link rel="icon" href="https://i.ibb.co/XCjDk5m/placeholder.png">
+    
     <title>RAPID Dashboard</title>
+    <style>
+        body {
+            background-image: url("Wireframe-1.png");
+            background-size: cover;
+            background-repeat:   no-repeat;
+            background-position: center center;
+        }
+    </style>
 </head>
 <body>
     <div class="navBar">
@@ -29,7 +38,7 @@
         <div class="iconDiv">
             <a href="about.html" target="_blank"><img src="https://i.ibb.co/ZYyVc52/Help-circle.png" class="icon"></a>
             <a href="RAPID.html" target="_self" onclick="preventBack(event)">
-                <img src="https://i.ibb.co/sw4wkfL/image-removebg-preview.png" class="icon">
+                <img src="https://i.ibb.co/sw4wkfL/image-removebg-preview.png" class="icon" onclick="confirmLogout(event)">
             </a>            
         </div>
     </div>
@@ -38,7 +47,31 @@
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Include Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+<!-- Include Leaflet JavaScript -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<!-- Include Leaflet Routing Machine CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+
+<!-- Include Leaflet Routing Machine JavaScript -->
+<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     <script src="../dashboard.js"></script>
+    <script>
+    function confirmLogout(event) {
+        event.preventDefault();  // Prevent default action (e.g., navigating away)
+        
+        const isConfirmed = confirm("Are you sure you want to log out?");
+        if (isConfirmed) {
+            // Redirect to the logout page or perform the logout action
+            window.location.href = "RAPID.html"; // Replace with your logout URL or action
+        }
+    }
+    
+    </script>
 </body>
 </html>

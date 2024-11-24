@@ -1,6 +1,5 @@
 
 body {
-    background-color: #d6ffff;
     display: flex;
     flex-direction: row;
     justify-content: left;
@@ -10,14 +9,12 @@ body {
 
 .container {
     animation: fadeIn 1s ease-out 0.5s forwards;
-    background-color: #d6ffff;
 }
 
 #supplies-list {
     justify-content: center;
     width: 60%;
     margin: 20px;
-    background-color: #d6ffff;
     font-family: 'Inter';
     display: flex;
     flex-direction: row;
