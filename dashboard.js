@@ -838,7 +838,7 @@ const rowsPerPage = 4;
                         <td>${store.hours}</td>
                         <td>${store.contact}</td>
                         <td><span class="supply-status">${store.supplyStatus}</span></td>
-                <td><button class="delete-button" onclick="deleteStoreAdmin('${store._id}')">DELETE</button></td>
+                <td><button class="edit-button" onclick="deleteStoreAdmin('${store._id}')">DELETE</button></td>
                     </tr>
                 `;
                 tableBody.innerHTML += row;
@@ -897,7 +897,7 @@ function goToPage(page) {
 async function deleteStoreAdmin(storeId) {
     const token = localStorage.getItem('authToken');  // JWT token or empty for admin credentials
     const email = 'admin@email.com';  // Admin email (hardcoded)
-    const password = 'rapidrapid';  // Admin password (hardcoded)
+    const password = 'rapid';  // Admin password (hardcoded)
 
     try {
         const response = await fetch(`${apiBaseUrl}/delete-store-admin/${storeId}`, {
