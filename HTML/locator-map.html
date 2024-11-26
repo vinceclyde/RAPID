@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet Road Closure</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.css" />
+    <style>
+        #map {
+            height: 500px;
+            width: 100%;
+        }
+        .controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        .controls button, .controls input {
+            margin: 5px 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <h3>Mark Closed Road</h3>
+        <label for="reporter">Reporter Name:</label>
+        <input type="text" id="reporter" placeholder="Enter your name">
+        <button id="clear-markers-btn">Clear Markers</button>
+        <button id="clear-roads-btn">Clear Roads</button>
+        <label for="startingPoint">Starting Point:</label>
+        <input class="input" type="text" id="storeAddress" placeholder="Add Starting Point" required>
+        <button type="button" class="locationButton" onclick="useCurrentLocation()">Use My Location</button>
+        <div>
+            <label for="supply-type">Choose a Supply:</label>
+            <select id="supply-type">
+                <option value="Food">Food</option>
+                <option value="Medical">Medical</option>
+                <option value="Gas">Gas</option>
+                <option value="Water">Water</option>
+            </select>
+        </div>
+        <button id="optimize-route" onclick="optimizeRoute()">Optimize Route</button>
+    </div>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.min.js"></script>
+
+    <script>
+
+        let userMarker;
+        let routeControl;
+        let supplyLocations = [];
+        let supplyType = "Food"; // Default supply type
+
+        // Initialize the map
+        window.map = L.map('map').setView([14.5995, 120.9842], 13); // Centered on Manila, Philippines
+
+        // Add OpenStreetMap tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+
+                // Fetch supplies and display them on the map
+        async function fetchSupplies1() {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                alert('No token found, please log in again.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${apiBaseUrl}/get-supplies`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('Error fetching supplies:', errorData);
+                    throw new Error(`Failed to fetch supplies: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('Fetched supplies:', data);
+
+                // Filter available and limited supplies
+               
+                data.forEach(supplyType => {
+                    // Log supply type to check the structure
+                    console.log('Processing supplyType:', supplyType);
+                    if (supplyType._id === supplyType) {
+                        console.log('Checking supply:', supply);
+                        supplyType.supplies.forEach(supply => {
+                            
+                            // Check for valid supply status and coordinates
+                            if ((supply.supplyStatus === 'Available' || supply.supplyStatus === 'Limited') && 
+                                supply.latitude && supply.longitude) {
+                                // Check if the coordinates are valid numbers
+                                if (isNaN(supply.latitude) || isNaN(supply.longitude)) {
+                                    console.warn(`Invalid coordinates for supply: ${supply.name}`);
+                                } else {
+                                    supplyLocations.push({
+                                        name: supply.name,
+                                        lat: supply.latitude,
+                                        lng: supply.longitude,
+                                        status: supply.supplyStatus
+                                    });
+                                }
+                            } else {
+                                console.warn(`Skipping supply (invalid status or coordinates): ${supply.name}`);
+                            
+                            }
+                        });
+                    }
+                });
+
+                 // Log the filtered supply locations for verification
+                console.log('Filtered Supply Locations:', supplyLocations);
+
+                // Now, use the supplyLocations array to create markers or calculate routes
+                if (supplyLocations.length > 0) {
+                    // Example: Call createRoute or another function to place markers or calculate routes
+                    createRoute(supplyLocations);  // Replace this with your actual map logic
+                } else {
+                    console.log("No valid supply locations found.");
+}
+
+            } catch (error) {
+                console.error(error);
+                alert('An error occurred while fetching supplies. Please try again later.');
+            }
+        }
+
+        // Get user's location and find nearest supply
+        function getUserLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+
+                    // Log the coordinates
+                    console.log('User Location:', lat, lng);
+
+                    // Place user marker on the map
+                    if (userMarker) {
+                        userMarker.setLatLng([lat, lng]);
+                    } else {
+                        userMarker = L.marker([lat, lng]).addTo(map);
+                    }
+                    map.setView([lat, lng], 13);
+
+                    // Fetch supplies and find the nearest one
+                    fetchSupplies1().then(() => {
+                        let nearestSupply = findNearestSupply(lat, lng);
+                        if (nearestSupply) {
+                            createRoute(lat, lng, nearestSupply);
+                        }
+                    });
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        // Find nearest supply
+        function findNearestSupply(userLat, userLng) {
+            let nearestSupply = null;
+            let shortestDistance = Infinity;
+
+            supplyLocations.forEach(supply => {
+                const distance = getDistance(userLat, userLng, supply.lat, supply.lng);
+                if (distance < shortestDistance) {
+                    shortestDistance = distance;
+                    nearestSupply = supply;
+                }
+            });
+
+            return nearestSupply;
+        }
+
+        // Haversine formula to calculate distance
+        function getDistance(lat1, lng1, lat2, lng2) {
+            const R = 6371; // Earth's radius in km
+            const dLat = toRad(lat2 - lat1);
+            const dLng = toRad(lng2 - lng1);
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                Math.sin(dLng / 2) * Math.sin(dLng / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        // Convert degrees to radians
+        function toRad(deg) {
+            return deg * (Math.PI / 180);
+        }
+
+        // Create the route and highlight the optimized one
+        function createRoute(startLat, startLng, nearestSupply) {
+            if (routeControl) {
+                map.removeControl(routeControl); // Remove previous routes
+            }
+
+            const endLat = nearestSupply.lat;
+            const endLng = nearestSupply.lng;
+
+            console.log('Creating route:', startLat, startLng, endLat, endLng);
+
+            const userLocation = L.latLng(startLat, startLng);
+            const supplyLocation = L.latLng(endLat, endLng);
+
+            // Add routing control to map and ensure directions are shown
+            routeControl = L.Routing.control({
+                waypoints: [userLocation, supplyLocation],
+                routeWhileDragging: true,
+                createMarker: function() { return null; }, // Don't create markers on the route
+                lineOptions: {
+                    styles: [
+                        { color: '#ff0000', weight: 5, opacity: 0.7 } // Style the route line
+                    ]
+                }
+            }).addTo(map); // Make sure the route is added to the map
+
+            routeControl.on('routesfound', function(e) {
+                const routes = e.routes;
+                const bestRoute = routes[0]; // The first route is usually the best/optimized
+                map.fitBounds(bestRoute.getBounds()); // Zoom and pan the map to fit the route
+            });
+        }
+
+        // Optimize route when button is clicked
+        function optimizeRoute() {
+            supplyType = document.getElementById('supply-type').value; // Get selected supply type
+            getUserLocation(); // Get user location and find nearest supply
+        }
+
+        document.querySelector('.submitButton').addEventListener('click', async () => {
+            const supplyType = document.querySelector('input[name="supplyType"]:checked').value;
+            const storeAddress = document.getElementById('storeAddress').value;
+
+            if (!storeAddress) {
+                alert('Please enter a starting point.');
+                return;
+            }
+
+            // Fetch nearest supply from the server
+            const nearestSupply = await fetchNearestSupply(storeAddress, supplyType);
+
+            if (!nearestSupply) {
+                alert('No supplies found or error fetching data.');
+                return;
+            }
+
+            // Proceed to calculate the route
+            const startLatLng = [storeLat, storeLng]; // Replace with actual coordinates
+            const endLatLng = [nearestSupply.latitude, nearestSupply.longitude];
+
+            // Clear previous route and markers
+            if (routingControl) {
+                map.removeControl(routingControl);
+            }
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+
+            // Add markers for both start and end points
+            const startMarker = L.marker(startLatLng).addTo(map);
+            const endMarker = L.marker(endLatLng).addTo(map);
+
+            const popupContent = `
+                <div>
+                    <strong>Starting Point</strong>: ${storeAddress}<br>
+                    <strong>Supply Location</strong>: ${nearestSupply.name}<br>
+                    <strong>Supply Type</strong>: ${nearestSupply.type}
+                </div>
+            `;
+            endMarker.bindPopup(popupContent).openPopup();
+
+            // Add routing control to show the optimized path
+            routingControl = L.Routing.control({
+                waypoints: [L.latLng(startLatLng), L.latLng(endLatLng)],
+                createMarker: function() { return null; }, // Disable routing markers
+                routeWhileDragging: true,
+            }).addTo(map);
+
+            // Zoom to the start and end points
+            map.fitBounds([startLatLng, endLatLng]);
+
+            // Add supply details to the list
+            updateSupplyList(nearestSupply);
+        });
+
+        async function fetchNearestSupply(startAddress, supplyType) {
+            try {
+                // Make an API call to get the nearest supply based on the selected supply type
+                const response = await fetch(`${apiBaseUrl}/get-nearest-supply`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                    },
+                    body: JSON.stringify({ startAddress, supplyType }),
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data || data.length === 0) {
+                    console.error('No supplies found');
+                    return null;
+                }
+
+                // Return the nearest supply data
+                return data[0]; // Assuming the nearest supply is the first in the list
+            } catch (error) {
+                console.error('Error fetching nearest supply:', error);
+                return null;
+            }
+        }
+
+    </script>
+    <script src="../dashboard.js"></script>
+</body>
+</html>
