@@ -784,11 +784,11 @@ async function submitRoadClosure(event) {
         const data = await response.json();
 
         if (data.success) {
-            alert('Road closure report submitted successfully!');
+            alert('Accident report submitted successfully!');
             clearClosure();
         } 
     } catch (error) {
-        console.error('Error submitting road closure report:', error);
+        console.error('Error submitting report:', error);
         alert('There was an error submitting your report');
     }
 }
@@ -956,7 +956,7 @@ async function handleApprovalOrRejection(closureId, isApprove) {
             throw new Error(`${action.toUpperCase()} action failed.`);
         }
 
-        alert(`Road closure ${isApprove ? 'approved' : 'rejected'} successfully!`);
+        alert(`Accident report ${isApprove ? 'approved' : 'rejected'} successfully!`);
 
         // Directly remove the closure element from the DOM
         const closureElement = document.getElementById(`closure-${closureId}`);
@@ -969,7 +969,7 @@ async function handleApprovalOrRejection(closureId, isApprove) {
 
     } catch (error) {
         console.error(`Error performing ${action} action:`, error);
-        alert(`Failed to ${action} the road closure.`);
+        alert(`Failed to ${action} the accident report.`);
     }
 }
 
@@ -994,7 +994,7 @@ async function fetchAndDisplayRoadClosures() {
             if (response.status === 401) {
                 console.error('Unauthorized: Invalid or expired token');
             } else {
-                throw new Error('Failed to fetch road closures');
+                throw new Error('Failed to fetch accident reports');
             }
         }
 
@@ -1003,7 +1003,7 @@ async function fetchAndDisplayRoadClosures() {
         closureDiv.innerHTML = ''; // Clear the div before displaying new content
 
         if (roadClosures.length === 0) {
-            closureDiv.innerHTML = '<p>No road closures reported.</p>';
+            closureDiv.innerHTML = '<p>No accident reports reported.</p>';
         } else {
             const table = document.createElement('table');
             table.classList.add('road-closures-table');
@@ -1054,7 +1054,7 @@ async function fetchAndDisplayRoadClosures() {
             });
         }
     } catch (error) {
-        console.error('Error fetching and displaying road closures:', error);
+        console.error('Error fetching and displaying accident reports:', error);
     }
 }
 
@@ -1087,7 +1087,7 @@ async function showClosureDetailsPopup(closureId) {
             if (response.status === 401) {
                 console.error('Unauthorized: Invalid or expired token');
             } else {
-                throw new Error('Failed to fetch road closure details');
+                throw new Error('Failed to fetch accident details');
             }
         }
 
@@ -1098,10 +1098,10 @@ async function showClosureDetailsPopup(closureId) {
         popup.classList.add('closure-popup');
         popup.innerHTML = `
             <div class="popup-content">
-                <h3>Road Closure Details</h3>
+                <h3>Accident Details</h3>
                 <p><strong>Reported by:</strong> ${closure.reporterName}</p>
                 <p><strong>Road Address:</strong> ${closure.roadAddress} ${closure.roadAddress2 ? ` going to ${closure.roadAddress2}` : ''}</p>
-                <p><strong>Reason for Closure:</strong> ${closure.roadReason}</p>
+                <p><strong>Accident Type:</strong> ${closure.roadReason}</p>
                 ${closure.imagePaths && closure.imagePaths.length > 0 ? 
                     `<div class="images"><strong>Closure Image:</strong><br>
                         ${closure.imagePaths.map(img => `<img src="${img}" alt="Road closure image" class="closure-image">`).join('')}
@@ -1145,7 +1145,7 @@ async function fetchAndDisplayApprovedRoads() {
             if (response.status === 401) {
                 console.error('Unauthorized: Invalid or expired token');
             } else {
-                throw new Error('Failed to fetch approved roads');
+                throw new Error('Failed to fetch approved accident reports');
             }
         }
 
@@ -1154,7 +1154,7 @@ async function fetchAndDisplayApprovedRoads() {
         roadsDiv.innerHTML = ''; // Clear the div before displaying new content
 
         if (approvedRoads.length === 0) {
-            roadsDiv.innerHTML = '<p>No approved roads found.</p>';
+            roadsDiv.innerHTML = '<p>No approved accident reports found.</p>';
         } else {
             const table = document.createElement('table');
             table.classList.add('approved-roads-table');
@@ -1171,7 +1171,7 @@ async function fetchAndDisplayApprovedRoads() {
                         <tr id="road-${road._id}">
                             <td>${road.roadReason}</td>
                             <td><button class="view-button2" data-id="${road._id}">VIEW</button></td>
-                            <td><button class="delete-button" data-id="${road._id}">REOPEN</button></td>
+                            <td><button class="delete-button" data-id="${road._id}">CLEAR</button></td>
                         </tr>
                     `).join('')}
                 </tbody>
@@ -1196,7 +1196,7 @@ async function fetchAndDisplayApprovedRoads() {
             });
         }
     } catch (error) {
-        console.error('Error fetching and displaying approved roads:', error);
+        console.error('Error fetching and displaying approved accident reports:', error);
     }
 }
 
@@ -1221,11 +1221,11 @@ async function deleteApprovedRoad(roadId) {
             if (response.status === 401) {
                 console.error('Unauthorized: Invalid or expired token');
             } else {
-                throw new Error('Failed to delete road');
+                throw new Error('Failed to delete accident report');
             }
         }
-        alert(`Road reopened!`);
-        console.log(`Road with ID ${roadId} deleted successfully`);
+        alert(`Accident vicinity cleared!`);
+        console.log(`Accident report ${roadId} deleted successfully`);
         
         // Remove the deleted road's row from the table
         const row = document.getElementById(`road-${roadId}`);
@@ -1233,7 +1233,7 @@ async function deleteApprovedRoad(roadId) {
             row.remove();
         }
     } catch (error) {
-        console.error('Error deleting road:', error);
+        console.error('Error deleting accident report:', error);
     }
 }
 
@@ -1244,10 +1244,10 @@ async function showRoadDetailsPopup(roadId) {
         return;
     }
 
-    console.log("Road ID:", roadId);  // Log the roadId for debugging
+    console.log("Accident Report ID:", roadId);  // Log the roadId for debugging
 
     if (!roadId) {
-        console.error('No road ID provided!');
+        console.error('No accident report ID provided!');
         return;
     }
 
@@ -1255,7 +1255,7 @@ async function showRoadDetailsPopup(roadId) {
     const road = approvedRoads.find(r => r._id === roadId);
 
     if (!road) {
-        console.error('Road not found!');
+        console.error('Accident report not found!');
         return;
     }
 
@@ -1264,10 +1264,10 @@ async function showRoadDetailsPopup(roadId) {
     popup.classList.add('road-popup');
     popup.innerHTML = `
         <div class="popup-content">
-            <h3>Road Details</h3>
+            <h3>Accident Details</h3>
             <p><strong>Reported by:</strong> ${road.reporterName}</p>
             <p><strong>Road Address:</strong> ${road.roadAddress} ${road.roadAddress2 ? ` going to ${road.roadAddress2}` : ''}</p>
-            <p><strong>Reason for Approval:</strong> ${road.roadReason}</p>
+            <p><strong>Accident Type:</strong> ${road.roadReason}</p>
             ${road.imagePaths && road.imagePaths.length > 0 ? 
                 `<div class="images"><strong>Closure Image:</strong><br>
                     ${road.imagePaths.map(img => `<img src="${img}" alt="Road image" class="road-image">`).join('')}
