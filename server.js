@@ -125,28 +125,52 @@ app.post('/register', async (req, res) => {
         res.status(500).json({ error: 'Error registering user' });
     }
 });
-
 // Login endpoint
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     try {
+        // Special case: Check if the email is admin@email.com and password is 'rapid'
+        if (email === 'admin@email.com' && password === 'rapid') {
+            // If the email is admin and the password is 'rapid', assign admin role
+            const token = jwt.sign(
+                { email: 'admin@email.com', role: 'admin' },
+                secretKey, 
+                { expiresIn: '1h' }
+            );
+            return res.json({ message: 'Logged in as Admin', token });
+        }
+
+        // For other users, fetch user data from the database
         const user = await usersCollection.findOne({ email });
         if (!user) {
             return res.status(400).json({ error: 'Invalid email or password' });
         }
 
+        // Compare the provided password with the stored hashed password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(400).json({ error: 'Invalid email or password' });
         }
 
-        const token = jwt.sign({ _id: user._id }, secretKey, { expiresIn: '1h' });
+        // Assign role from the user data or default to 'user' if no role is set
+        const role = user.role || 'user';
+
+        // Generate JWT token including the user's role
+        const token = jwt.sign(
+            { _id: user._id, email: user.email, role: role },
+            secretKey, 
+            { expiresIn: '1h' }
+        );
+
+        // Send the response with the token
         res.json({ message: 'Logged in successfully', token });
     } catch (err) {
+        console.error('Login error:', err);
         res.status(500).json({ error: 'Error logging in' });
     }
 });
+
 
 // Middleware to authenticate the user (verify JWT token)
 // Apply authenticate middleware only to routes that need authentication
@@ -191,6 +215,16 @@ app.get('/get-stores', authenticate, async (req, res) => {
     }
 });
 
+app.get('/get-all-stores', authenticate, async (req, res) => {
+    try {
+        const stores = await storesCollection.find({}).toArray(); // Fetch all stores without filtering
+        res.json(stores || []); // Return an empty array if no stores are found
+    } catch (err) {
+        res.status(500).json({ error: 'Error fetching stores' });
+    }
+});
+
+
 // Get store details by ID (requires authentication)
 app.get('/get-store/:id', authenticate, async (req, res) => {
     const { id } = req.params;
@@ -234,6 +268,7 @@ app.put('/update-store/:id', authenticate, async (req, res) => {
     }
 });
 
+
 // Delete store endpoint (requires authentication)
 app.delete('/delete-store/:id', authenticate, async (req, res) => {
     const { id } = req.params;
@@ -258,20 +293,21 @@ app.delete('/delete-store/:id', authenticate, async (req, res) => {
 app.post('/api/report-road-closure', async (req, res) => {
     console.log('Request Body:', req.body);
 
-    const { reporterName, roadAddress, roadReason } = req.body;
+    const { reporterName, roadAddress, roadAddress2, roadReason, startCoordinates, endCoordinates } = req.body;
 
-    // Check if required fields are provided
-    if (!reporterName || !roadAddress || !roadReason) {
-        return res.status(400).json({ error: 'All fields are required.' });
+    if (!reporterName || !roadAddress || !roadReason || !startCoordinates || !endCoordinates) {
+        return res.status(400).json({ error: 'All fields, including coordinates, are required.' });
     }
 
     try {
-        // Insert the data into MongoDB
         const reportData = {
             reporterName,
             roadAddress,
+            roadAddress2,
             roadReason,
-            createdAt: new Date()
+            startCoordinates,
+            endCoordinates,
+            createdAt: new Date(),
         };
 
         const result = await client.db('RAPID').collection('roadClosures').insertOne(reportData);
@@ -284,6 +320,42 @@ app.post('/api/report-road-closure', async (req, res) => {
     } catch (err) {
         console.error('Error submitting report:', err);
         res.status(500).json({ error: 'An error occurred while submitting the report.' });
+    }
+});
+app.delete('/delete-store-admin/:id', authenticate, async (req, res) => {
+    const storeId = req.params.id;
+    const { user } = req;  // Access the authenticated user
+
+    try {
+        // Ensure storesCollection is available
+        if (!storesCollection) {
+            return res.status(500).json({ error: 'Stores collection is not initialized' });
+        }
+
+        // Use findOne to get the store by _id
+        const store = await storesCollection.findOne({ _id: convertToObjectId(storeId) });
+        
+        if (!store) {
+            return res.status(404).json({ error: 'Store not found' });
+        }
+
+        // If the user is an admin, they can delete any store
+        if (user.role === 'admin') {
+            console.log('Admin user detected');
+            await storesCollection.deleteOne({ _id: convertToObjectId(storeId) });
+            return res.status(200).json({ message: 'Store deleted successfully' });
+        }
+
+        // If the user is not an admin, check if they are the owner of the store
+        if (store.userId.toString() !== user._id.toString()) {
+            return res.status(403).json({ error: 'You can only delete your own stores' });
+        }
+
+        await storesCollection.deleteOne({ _id: convertToObjectId(storeId) });
+        res.status(200).json({ message: 'Store deleted successfully' });
+    } catch (err) {
+        console.error('Error deleting store:', err);
+        res.status(500).json({ error: 'An error occurred while deleting the store' });
     }
 });
 

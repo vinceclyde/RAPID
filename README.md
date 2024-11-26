@@ -49,7 +49,6 @@
 ⦿ <b>JavaScript</b> - adds interactivity and dynamic functionality to RAPID, enabling features like animations, form validation, and data fetching.
 <h3><b>Data Storage and Management</b></h3>
 ⦿ <b>MongoDB Cloud</b> - used to store user and store information.<br>
-⦿ <b>Supabase</b> - used to store unstructured data, particulary image files.<br>
 <h3><b>Backend Development Tools</b></h3>
 <p>⦿ <a href="https://nodejs.org/en/download/package-manager"><span>Node.js and Node Package Manager</span></p></a>
 <pre><code>node -v</code></pre>
@@ -63,10 +62,11 @@
 <pre><code>npm install express cors bcryptjs body-parser mongodb</code></pre>
 <h3><b>APIs</b></h3>
 ⦿ <b>OpenStreetMap</b> - a map tile source providing free geographic data and map visuals.<br>
+⦿ <b>Google Maps Geocoding API</b> - provides geocoding and reverse geocoding of addresses.<br>
 ⦿ <b>Nominatim Geocoding API</b> - converts text-based location data into geographic coordinates and vice versa.
 <h3><b>Libraries/Plugins</b></h3>
 ⦿ <b>Leaflet</b> - provides tools to initialize and manipulate maps, markers, and layers.<br>
-⦿ <b>Leaflet Routing Machine</b> - adds routing and waypoint features to Leaflet
+⦿ <b>Leaflet Routing Machine</b> - adds routing and waypoint features to Leaflet.
 </div>
 
 ### <a name="preview"></a>
@@ -85,7 +85,7 @@
       <div align="left"><strong>💡Eljay P. Marasigan</strong><br>
         ➟ Leader/Frontend Developer<br>
         ➟ 22-05538<br>
-        🎧 <b>BMW</b> - Because ft. Leslie
+        🎧 <b>traitor</b> - Olivia Rodrigo
       </div>
     </td>
   </tr>

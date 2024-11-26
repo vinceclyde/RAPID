@@ -2,6 +2,55 @@ const apiBaseUrl = 'http://localhost:5000';
 const rowsPerPage = 6; 
 let currentPage = 1;
 
+// Function to fetch stores and populate the table
+async function fetchStores() {
+    try {
+        // Make a GET request to the '/get-stores' endpoint
+        const response = await fetch('/get-stores', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        // Check if the request was successful
+        if (!response.ok) {
+            throw new Error('Error fetching stores');
+        }
+
+        // Parse the response JSON data
+        const stores = await response.json();
+
+        // Populate the table with store data
+        const tableBody = document.getElementById('table-body');
+        tableBody.innerHTML = ''; // Clear the table body before adding new rows
+
+        stores.forEach(store => {
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td>${store.storeName}</td>
+                <td>${store.address}</td>
+                <td>${store.supplyType}</td>
+                <td>${store.workingHours}</td>
+                <td>${store.contactNumber}</td>
+                <td>${store.supplyStatus}</td>
+                <td><button class="editStatusBtn" data-id="${store._id}">Edit</button></td>
+            `;
+
+            // Append the new row to the table
+            tableBody.appendChild(row);
+        });
+    } catch (error) {
+        console.error('Error fetching stores:', error);
+        alert('An error occurred while fetching the stores. Please try again.');
+    }
+}
+
+// Call the fetchStores function when the page loads
+document.addEventListener('DOMContentLoaded', fetchStores);
+
+
 // Update pagination buttons based on the current page
 function updatePagination() {
     const totalPages = Math.ceil(stores.length / rowsPerPage);

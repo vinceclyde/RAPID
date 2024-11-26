@@ -61,50 +61,49 @@
         passwordField.addEventListener('input', () => {
             submitButton.disabled = !emailField.value || !passwordField.value;
         });
-    
-        // Handle form submission
         signInForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-    
-            const email = emailField.value;
-            const password = passwordField.value;
-    
-            try {
-                // Check if the username and password are "username" and "password" for admin redirect
-                if (email === 'admin@email.com' && password === 'rapid') {
-                    alert('Welcome, Admin!');
-                    window.location.href = 'adminDashboard.html';  // Redirect to admin dashboard
-                } else {
-                    // Proceed with the default fetch request for other users
-                    const response = await fetch('http://localhost:5000/login', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ email, password }),
-                    });
-    
-                    const result = await response.json();
-    
-                    if (response.ok) {
-                        // Success message
-                        alert(result.message);
+    event.preventDefault();
 
-                        // Store the token in localStorage
-                        localStorage.setItem('authToken', result.token);
-                        
-                        // Redirect to user dashboard
-                        window.location.href = 'dashboard.html';  // Default user dashboard redirect
-                    } else {
-                        // Error message
-                        alert(result.error || 'An error occurred during login.');
-                    }
-                }
-            } catch (err) {
-                console.error('Error during login:', err);
-                alert('An error occurred while logging in. Please try again.');
-            }
+    const email = emailField.value;
+    const password = passwordField.value;
+
+    console.log('Form submitted:', email, password); // Log form values
+
+    try {
+        // Always send credentials to the backend
+        const response = await fetch('http://localhost:5000/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password }),
         });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert(result.message);
+
+            // Store the token in localStorage
+            localStorage.setItem('authToken', result.token);
+
+            // Redirect based on role
+            const decodedToken = JSON.parse(atob(result.token.split('.')[1]));
+            if (decodedToken.role === 'admin') {
+                window.location.href = 'adminDashboard.html';
+            } else {
+                window.location.href = 'dashboard.html';
+            }
+        } else {
+            alert(result.error || 'An error occurred during login.');
+        }
+    } catch (err) {
+        console.error('Error during login:', err);
+        alert('An error occurred while logging in. Please try again.');
+    }
+});
+
+
     </script>    
 </body>
 </html>

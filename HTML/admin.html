@@ -20,19 +20,19 @@
                     <label for="sortby1">Sort By Type:</label>
                     <select id="sortby1" name="sortby1">
                         <option value="">All Types</option>
-                        <option value="watersupply">Water Supply</option>
-                        <option value="gassupply">Gas Supply</option>
-                        <option value="medicalsupply">Medical Supply</option>
-                        <option value="foodsupply">Food Supply</option>
+                        <option value="Water">Water Supply</option>
+                        <option value="Gas">Gas Supply</option>
+                        <option value="Medical">Medical Supply</option>
+                        <option value="Food">Food Supply</option>
                     </select>
                 </div>
                 <div class="sortby">
                     <label for="sortby2">Sort By Status:</label>
                     <select id="sortby2" name="sortby2">
                         <option value="">All Status</option>
-                        <option value="availablesupply">Available</option>
-                        <option value="limitedsupply">Limited</option>
-                        <option value="ofssupply">Out of Stock</option>
+                        <option value="Available">Available</option>
+                        <option value="Limited">Limited</option>
+                        <option value="Out Of Stock">Out of Stock</option>
                     </select>
                 </div>
             </div>
@@ -46,14 +46,13 @@
                             <th>Working Hour</th>
                             <th>Contact Number</th>
                             <th>Supply Status</th>
-                            <th>Edit Supply Status</th>
+                            <th>Delete Supply Status</th>
                         </tr>
                     </thead>
                     <tbody id="table-body">
                         <!-- Dynamic rows will be appended here -->
                     </tbody>
                 </table>
-
                 <!-- Pagination inside the table container -->
                 <div class="pagination" id="pagination-container">
                     <!-- Pagination buttons will be dynamically added here -->
@@ -64,8 +63,113 @@
                 <div class="roadReopen"></div>
             </div>
         </div>
+        
     </div>
+    <script>
+        const apiBaseUrl = 'http://localhost:5000'; 
+        const rowsPerPage = 6; 
+        let currentPage = 1;
+        let filteredStores = [];
+        // Fetch stores from the database and display them in the table
+        async function fetchStores2() {
+            const token = localStorage.getItem('authToken'); 
+    try {
+        const response = await fetch(`${apiBaseUrl}/get-all-stores`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`, // Add the Bearer token
+                'Content-Type': 'application/json'
+            }
+        });
+        const stores = await response.json();
+        if (Array.isArray(stores)) {
+            // Get selected filter values
+            const supplyTypeFilter = document.getElementById("sortby1").value;
+            const supplyStatusFilter = document.getElementById("sortby2").value;
+            // Filter stores based on selected options
+            filteredStores = stores.filter(store => {
+                const matchesSupplyType = supplyTypeFilter ? store.supplyType === supplyTypeFilter : true;
+                const matchesSupplyStatus = supplyStatusFilter ? store.supplyStatus === supplyStatusFilter : true;
+                return matchesSupplyType && matchesSupplyStatus;
+            });
+            displayStores2();
+            updatePagination();
+        } else {
+            console.error("Invalid response format:", stores);
+        }
+    } catch (error) {
+        console.error("Error fetching stores:", error);
+    }
+}
 
-    <script src="../admin.js"></script> 
+        // Display stores in the table
+        function displayStores2() {
+            const tableBody = document.getElementById("table-body");
+            tableBody.innerHTML = ''; // Clear previous rows
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = Math.min(currentPage * rowsPerPage, filteredStores.length);
+            for (let i = startIndex; i < endIndex; i++) {
+                const store = filteredStores[i];
+                const row = ` 
+                    <tr>
+                        <td>${store.name}</td>
+                        <td>${store.address}</td>
+                        <td>${store.supplyType}</td>
+                        <td>${store.hours}</td>
+                        <td>${store.contact}</td>
+                        <td><span class="supply-status">${store.supplyStatus}</span></td>
+                        <td><button class="edit-button">DELETE</button></td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            }
+        }
+        // Update pagination buttons based on the current page
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredStores.length / rowsPerPage);
+            const paginationContainer = document.getElementById("pagination-container");
+            paginationContainer.innerHTML = ''; // Clear current pagination
+            // Generate previous button
+            const prevButton = document.createElement('button');
+            prevButton.innerHTML = '<';
+            prevButton.disabled = currentPage === 1;
+            prevButton.onclick = () => changePage(-1);
+            paginationContainer.appendChild(prevButton);
+            // Generate page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.innerHTML = i;
+                pageButton.classList.add('page-number');
+                if (i === currentPage) {
+                    pageButton.classList.add('active');
+                }
+                pageButton.onclick = () => goToPage(i);
+                paginationContainer.appendChild(pageButton);
+            }
+            // Generate next button
+            const nextButton = document.createElement('button');
+            nextButton.innerHTML = '>';
+            nextButton.disabled = currentPage === totalPages;
+            nextButton.onclick = () => changePage(1);
+            paginationContainer.appendChild(nextButton);
+        }
+        // Handle pagination button click
+        function changePage(direction) {
+            currentPage += direction;
+            displayStores2();
+            updatePagination();
+        }
+        // Go to a specific page when clicking on page number
+        function goToPage(page) {
+            currentPage = page;
+            displayStores2();
+            updatePagination();
+        }
+        // Add event listeners for the dropdowns
+        document.getElementById("sortby1").addEventListener("change", fetchStores2);
+        document.getElementById("sortby2").addEventListener("change", fetchStores2);
+        // Fetch and display stores on page load
+        fetchStores2();
+    </script>
 </body>
 </html>

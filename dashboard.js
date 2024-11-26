@@ -22,12 +22,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     initializeMap(); // Initialize map
                     setupAddressInput(); // Setup address suggestions
                     fetchStores(); // Fetch and display stores only for the register-store page
+                } else if (file === "admin.html") {
+                    fetchStores2(); // Fetch stores for admin page
+                    displayStores2(); // Display stores in admin page table
+                    document.getElementById("sortby1").addEventListener("change", fetchStores2);
+                    document.getElementById("sortby2").addEventListener("change", fetchStores2);
                 }
             })
             .catch(error => {
                 console.error("Error loading content:", error);
                 contentArea.innerHTML = "<p>Content not available.</p>";
             });
+            
     }
 
     // Load "Dashboard" by default
@@ -52,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     document.getElementById("roadClosure").addEventListener("click", () => {
-        window.open("road-closure.html", "_blank"); // Opens the page in a new tab
+        window.open("roads.html", "_blank"); // Opens the page in a new tab
     });
     
     
@@ -303,6 +309,32 @@ function displayStores(stores) {
     });
 }
 
+// Store the selected store ID for update purposes
+let selectedStoreId = null; 
+
+function toggleButton(isUpdate) {
+    const submitButton = document.querySelector(".submitButton");
+    if (isUpdate) {
+        submitButton.textContent = "UPDATE"; // Change button text to UPDATE
+        submitButton.setAttribute("onclick", "updateStore()"); // Attach update function
+    } else {
+        submitButton.textContent = "REGISTER"; // Change button text to REGISTER
+        submitButton.setAttribute("onclick", "registerStore()"); // Attach register function
+    }
+}
+
+function clearStoreForm() {
+    document.getElementById("storeName").value = "";
+    document.getElementById("storeAddress").value = "";
+    document.getElementById("storeHours").value = "";
+    document.getElementById("contactNumber").value = "";
+
+
+    selectedStoreId = null; // Clear the selected store ID
+    toggleButton(false); // Reset button to REGISTER mode
+}
+
+
 // Register store function
 async function registerStore() {
     if (!token) {
@@ -314,11 +346,11 @@ async function registerStore() {
     const storeAddress = document.getElementById("storeAddress").value;
     const storeHours = document.getElementById("storeHours").value;
     const contactNumber = document.getElementById("contactNumber").value;
-    const supplyType = document.querySelector('input[name="supplyType"]:checked').value || "";
-    const supplyStatus = document.querySelector('input[name="supplyStatus"]:checked').value || "";
+    const supplyType = document.querySelector('input[name="supplyType"]:checked')?.value || "";
+    const supplyStatus = document.querySelector('input[name="supplyStatus"]:checked')?.value || "";
 
-    if (!selectedLatitude || !selectedLongitude) {
-        alert("Please select a valid address from the suggestions.");
+    if (!storeName || !storeAddress || !storeHours || !contactNumber) {
+        alert("Please fill in all the fields.");
         return;
     }
 
@@ -329,16 +361,16 @@ async function registerStore() {
         contact: contactNumber,
         supplyType,
         supplyStatus,
-        latitude: selectedLatitude, // Send latitude
-        longitude: selectedLongitude // Send longitude
+        latitude: selectedLatitude,
+        longitude: selectedLongitude
     };
 
     try {
         const response = await fetch(`${apiBaseUrl}/register-store`, {
-            method: 'POST',
+            method: "POST",
             headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
             },
             body: JSON.stringify(store)
         });
@@ -346,29 +378,24 @@ async function registerStore() {
         const data = await response.json();
         if (data.message) {
             alert(data.message);
-            fetchStores(); // Refresh the stores list
-            clearStoreForm(); // Clear the form after submission
+
+            fetchStores(); // Refresh the store list
+            clearStoreForm(); // Reset the form and button to default state
         } else {
-            console.error('Error registering store:', data);
+            console.error("Error registering store:", data.error || "Unknown error");
         }
     } catch (error) {
-        console.error('Error during store registration:', error);
+        console.error("Error during store registration:", error);
     }
 }
 
-function clearStoreForm() {
-    document.getElementById("storeName").value = "";
-    document.getElementById("storeAddress").value = "";
-    document.getElementById("storeHours").value = "";
-    document.getElementById("contactNumber").value = "";
-}
+
 
 window.onload = fetchStores;
 document.addEventListener('DOMContentLoaded', function () {
     fetchStores();  // Fetch stores when the page loads
 });
-// Store the selected store ID for update purposes
-let selectedStoreId = null;
+
 
 async function deleteStore() {
     const selectedStoreId = document.querySelector('input[name="selectedStore"]:checked')?.value;
@@ -400,56 +427,61 @@ async function deleteStore() {
 
 
 async function prepareUpdate() {
-    let selectedStoreId = document.querySelector('input[name="selectedStore"]:checked')?.value;
-    if (!selectedStoreId) {
-        alert("Please select a store to update.");
+    const selectedId = document.querySelector('input[name="selectedStore"]:checked')?.value;
+    if (!selectedId) {
+        alert("Please select a store to edit.");
         return;
     }
 
     try {
-        const response = await fetch(`${apiBaseUrl}/get-store/${selectedStoreId}`, {
-            method: 'GET',
+        const response = await fetch(`${apiBaseUrl}/get-store/${selectedId}`, {
+            method: "GET",
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-        });   
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+        });
         const store = await response.json();
 
         if (store) {
-            // Pre-fill the form with store details for update
+            // Pre-fill form fields
             document.getElementById("storeName").value = store.name;
             document.getElementById("storeAddress").value = store.address;
             document.getElementById("storeHours").value = store.hours;
             document.getElementById("contactNumber").value = store.contact;
-
             document.querySelector(`input[name="supplyType"][value="${store.supplyType}"]`).checked = true;
             document.querySelector(`input[name="supplyStatus"][value="${store.supplyStatus}"]`).checked = true;
 
-            // Store the selected store's ID globally
-            selectedStoreId = store._id;
+            selectedStoreId = store._id; // Set the selected store ID globally
+
+            // Toggle button to UPDATE mode
+            toggleButton(true);
         } else {
-            console.error("Store not found for update.");
+            console.error("Store not found.");
         }
     } catch (error) {
         console.error("Error fetching store details:", error);
     }
 }
 
-
 async function updateStore() {
-    const selectedStoreId = document.querySelector('input[name="selectedStore"]:checked')?.value;
     if (!selectedStoreId) {
-        alert("Please select a store to update.");
+        alert("No store selected for update.");
         return;
     }
 
+    // Collect store details
     const storeName = document.getElementById("storeName").value;
     const storeAddress = document.getElementById("storeAddress").value;
     const storeHours = document.getElementById("storeHours").value;
     const contactNumber = document.getElementById("contactNumber").value;
-    const supplyType = document.querySelector('input[name="supplyType"]:checked').value || "";
-    const supplyStatus = document.querySelector('input[name="supplyStatus"]:checked').value || "";
+    const supplyType = document.querySelector('input[name="supplyType"]:checked')?.value || "";
+    const supplyStatus = document.querySelector('input[name="supplyStatus"]:checked')?.value || "";
+
+    if (!storeName || !storeAddress || !storeHours || !contactNumber) {
+        alert("Please fill in all the fields.");
+        return;
+    }
 
     const store = {
         name: storeName,
@@ -458,16 +490,16 @@ async function updateStore() {
         contact: contactNumber,
         supplyType,
         supplyStatus,
-        latitude: selectedLatitude, // Updated latitude
-        longitude: selectedLongitude // Updated longitude
+        latitude: selectedLatitude,
+        longitude: selectedLongitude
     };
 
     try {
         const response = await fetch(`${apiBaseUrl}/update-store/${selectedStoreId}`, {
-            method: 'PUT',
+            method: "PUT",
             headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
             },
             body: JSON.stringify(store)
         });
@@ -475,25 +507,13 @@ async function updateStore() {
         const data = await response.json();
         if (data.message) {
             alert(data.message);
-
-            // Remove existing map instance
-            if (window.map) {
-                window.map.remove();
-            }
-
-            // Reinitialize map
-            initializeMap();
-
-            // Fetch and display updated stores
-            fetchStores();
-
-            // Clear the form
-            clearStoreForm();
+            fetchStores(); // Refresh the store list
+            clearStoreForm(); // Reset the form and button
         } else {
-            console.error('Error updating store:', data);
+            console.error("Error updating store:", data.error || "Unknown error");
         }
     } catch (error) {
-        console.error('Error during store update:', error);
+        console.error("Error during store update:", error);
     }
 }
 
@@ -547,7 +567,7 @@ function displayStores(stores) {
 async function fetchSupplies() {
     const token = localStorage.getItem('authToken');
     if (!token) {
-        console.log('No token found, please log in again.');
+        alert('No token found, please log in again.');
         return;
     }
 
@@ -573,24 +593,38 @@ async function fetchSupplies() {
 
         const markerMap = {}; // Map to store markers by supply ID or some unique property
 
-                        // Define icons for each supply type
-                        const iconMap = {
-                            Food: 'styles/assets/food_icon.png',
-                            Medical: 'styles/assets/medic_icon.png',
-                            Gas: 'styles/assets/gas_icon.png',
-                            Water: 'styles/assets/water_icon.png',
-                        };
-
-        // Sort data by supply type (e.g., by _id)
-        data.sort((a, b) => a._id.localeCompare(b._id));
+        // Define icons for each supply type
+        const iconMap = {
+            Food: 'styles/assets/food_icon.png',
+            Medical: 'styles/assets/medic_icon.png',
+            Gas: 'styles/assets/gas_icon.png',
+            Water: 'styles/assets/water_icon.png',
+        };
 
         data.forEach(supplyType => {
             const supplyContainer = document.createElement('div');
             supplyContainer.classList.add('supply-container');
 
-                const typeHeader = document.createElement('h2');
-                typeHeader.textContent = `${supplyType._id} Supply`;
-                supplyContainer.appendChild(typeHeader);
+            // Create a container for the header and image
+            const headerContainer = document.createElement('div');
+            headerContainer.classList.add('header-container');
+
+            // Create the image element
+            const typeImage = document.createElement('img');
+            typeImage.src = iconMap[supplyType._id] || 'assets/icons/default.png'; // Use default icon if not found
+            typeImage.alt = `${supplyType._id} Icon`;
+            typeImage.classList.add('supply-type-icon');
+
+            // Create the header
+            const typeHeader = document.createElement('h2');
+            typeHeader.textContent = `${supplyType._id} Supply`;
+
+            // Append the image and header to the container
+            headerContainer.appendChild(typeImage);
+            headerContainer.appendChild(typeHeader);
+
+            // Append the header container to the supply container
+            supplyContainer.appendChild(headerContainer);
 
             // Sort supplies by name
             supplyType.supplies.sort((a, b) => {
@@ -663,8 +697,11 @@ async function fetchSupplies() {
             suppliesList.appendChild(supplyContainer);
         });
 
+    } else {
+        alert('Failed to fetch supplies: ' + (data.error || 'Unknown error.'));
     }
 }
+
 
 //Dashboard map markers
 function createCustomMarker(status) {
@@ -743,14 +780,148 @@ async function submitRoadClosure(event) {
         if (data.success) {
             alert('Road closure report submitted successfully!');
             clearClosure();
-        } else {
-            alert('Error submitting report: ' + data.error);
-        }
+        } 
     } catch (error) {
         console.error('Error submitting road closure report:', error);
         alert('There was an error submitting your report');
     }
 }
 
+const rowsPerPage = 4; 
+        let currentPage = 1;
+        let filteredStores = [];
+        // Fetch stores from the database and display them in the table
+        async function fetchStores2() {
+            const token = localStorage.getItem('authToken'); 
+    try {
+        const response = await fetch(`${apiBaseUrl}/get-all-stores`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`, // Add the Bearer token
+                'Content-Type': 'application/json'
+            }
+        });
+        const stores = await response.json();
+        if (Array.isArray(stores)) {
+            // Get selected filter values
+            const supplyTypeFilter = document.getElementById("sortby1").value;
+            const supplyStatusFilter = document.getElementById("sortby2").value;
+            // Filter stores based on selected options
+            filteredStores = stores.filter(store => {
+                const matchesSupplyType = supplyTypeFilter ? store.supplyType === supplyTypeFilter : true;
+                const matchesSupplyStatus = supplyStatusFilter ? store.supplyStatus === supplyStatusFilter : true;
+                return matchesSupplyType && matchesSupplyStatus;
+            });
+            displayStores2();
+            updatePagination();
+        } else {
+            console.error("Invalid response format:", stores);
+        }
+    } catch (error) {
+        console.error("Error fetching stores:", error);
+    }
+}
+
+        // Display stores in the table
+        function displayStores2() {
+            const tableBody = document.getElementById("table-body");
+            tableBody.innerHTML = ''; // Clear previous rows
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = Math.min(currentPage * rowsPerPage, filteredStores.length);
+            for (let i = startIndex; i < endIndex; i++) {
+                const store = filteredStores[i];
+                const row = ` 
+                    <tr>
+                        <td>${store.name}</td>
+                        <td>${store.address}</td>
+                        <td>${store.supplyType}</td>
+                        <td>${store.hours}</td>
+                        <td>${store.contact}</td>
+                        <td><span class="supply-status">${store.supplyStatus}</span></td>
+                <td><button class="edit-button" onclick="deleteStoreAdmin('${store._id}')">DELETE</button></td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            }
+        }
+        // Update pagination buttons based on the current page
+        function updatePagination() {
+    const totalPages = Math.ceil(filteredStores.length / rowsPerPage);
+    const paginationContainer = document.getElementById("pagination-container");
+    paginationContainer.innerHTML = ''; // Clear current pagination
+
+    // Show previous button
+    const prevButton = document.createElement('button');
+    prevButton.innerHTML = '<';
+    prevButton.disabled = currentPage === 1;
+    prevButton.onclick = () => changePage(-1);
+    paginationContainer.appendChild(prevButton);
+
+    // Calculate the range of page numbers to display (2 pages at a time)
+    let startPage = Math.max(1, currentPage);
+    let endPage = Math.min(totalPages, currentPage + 1);
+
+    // Display the page numbers (current and next one)
+    for (let i = startPage; i <= endPage; i++) {
+        const pageButton = document.createElement('button');
+        pageButton.innerHTML = i;
+        pageButton.classList.add('page-number');
+        if (i === currentPage) {
+            pageButton.classList.add('active');
+        }
+        pageButton.onclick = () => goToPage(i);
+        paginationContainer.appendChild(pageButton);
+    }
+
+    // Show next button
+    const nextButton = document.createElement('button');
+    nextButton.innerHTML = '>';
+    nextButton.disabled = currentPage === totalPages;
+    nextButton.onclick = () => changePage(1);
+    paginationContainer.appendChild(nextButton);
+}
+
+// Handle pagination button click
+function changePage(direction) {
+    currentPage += direction;
+    displayStores2();
+    updatePagination();
+}
+
+// Go to a specific page when clicking on a page number
+function goToPage(page) {
+    currentPage = page;
+    displayStores2();
+    updatePagination();
+}
+async function deleteStoreAdmin(storeId) {
+    const token = localStorage.getItem('authToken');  // JWT token or empty for admin credentials
+    const email = 'admin@email.com';  // Admin email (hardcoded)
+    const password = 'rapid';  // Admin password (hardcoded)
+
+    try {
+        const response = await fetch(`${apiBaseUrl}/delete-store-admin/${storeId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,  // Use token if present
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, password })  // Send email and password if using hardcoded credentials
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            alert('Store deleted successfully!');
+            fetchStores2();  // Refresh the list after deletion
+        } else {
+            alert(data.error || 'Failed to delete store');
+        }
+    } catch (error) {
+        console.error('Error deleting store:', error);
+        alert('An error occurred while deleting the store.');
+    }
+}
+
+        
 
 window.onload = fetchSupplies();
