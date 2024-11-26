@@ -25,6 +25,7 @@ const client = new MongoClient(uri, {
 let usersCollection;
 let storesCollection;
 let roadClosures;
+let approvedRoadsCollection;
 
 // Connect to MongoDB
 client.connect()
@@ -32,6 +33,7 @@ client.connect()
         usersCollection = client.db('RAPID').collection('users'); // 'users' collection
         storesCollection = client.db('RAPID').collection('stores'); // 'stores' collection
         roadClosures = client.db('RAPID').collection('roadClosures');
+        approvedRoadsCollection = client.db('RAPID').collection('approvedRoads');
         console.log('Connected to MongoDB');
     })
     .catch((err) => {
@@ -224,6 +226,80 @@ app.get('/get-all-stores', authenticate, async (req, res) => {
     }
 });
 
+app.get('/get-road-closures', authenticate, async (req, res) => {
+    try {
+        const closures = await roadClosures.find().toArray();
+        console.log('Fetched closures:', closures); // Log to see what data is returned
+        if (closures.length > 0) {
+            res.json(closures); // Return all road closures if any are found
+        } else {
+            res.status(404).json({ error: 'No road closures found' });
+        }
+    } catch (err) {
+        console.error("Error fetching road closures:", err);
+        res.status(500).json({ error: 'Error fetching road closures' });
+    }
+});
+
+// Fetch specific road closure by ID (requires authentication)
+app.get('/get-road-closure/:id', authenticate, async (req, res) => {
+    const { id } = req.params; // Get the closureId from the request parameters
+
+    try {
+        // Convert the closureId to an ObjectId if it's a MongoDB ObjectId
+        const objectId = convertToObjectId(id);
+
+        // Fetch the road closure data from the database using the provided ID
+        const closure = await roadClosures.findOne({ _id: objectId });
+
+        if (closure) {
+            // Send the road closure data if found
+            res.json(closure);
+        } else {
+            // If no closure is found, return a 404 error
+            res.status(404).json({ error: 'Road closure not found' });
+        }
+    } catch (err) {
+        console.error("Error fetching road closure:", err);
+        res.status(500).json({ error: 'Error fetching road closure' });
+    }
+});
+
+app.get('/get-approved-roads', authenticate, async (req, res) => {
+    try {
+        console.log("Fetching approved roads...");
+        const approvedRoads = await approvedRoadsCollection.find().toArray();
+        console.log('Fetched approved roads:', approvedRoads);
+        if (approvedRoads.length > 0) {
+            res.json(approvedRoads);
+        } else {
+            res.status(404).json({ error: 'No approved roads found' });
+        }
+    } catch (err) {
+        console.error("Error fetching approved roads:", err);
+        res.status(500).json({ error: 'Error fetching approved roads' });
+    }
+});
+
+app.delete('/delete-road/:roadId', authenticate, async (req, res) => {
+    const { roadId } = req.params;
+    try {
+        console.log(`Attempting to delete road with ID: ${roadId}`);
+        
+        const result = await approvedRoadsCollection.deleteOne({ _id: new ObjectId(roadId) });
+        
+        if (result.deletedCount === 1) {
+            console.log(`Road with ID ${roadId} deleted successfully`);
+            res.status(200).json({ message: `Road with ID ${roadId} deleted successfully` });
+        } else {
+            console.warn(`No road found with ID: ${roadId}`);
+            res.status(404).json({ error: `No road found with ID: ${roadId}` });
+        }
+    } catch (err) {
+        console.error("Error deleting road:", err);
+        res.status(500).json({ error: 'Error deleting road' });
+    }
+});
 
 // Get store details by ID (requires authentication)
 app.get('/get-store/:id', authenticate, async (req, res) => {
@@ -290,30 +366,61 @@ app.delete('/delete-store/:id', authenticate, async (req, res) => {
     }
 });
 
-app.post('/api/report-road-closure', async (req, res) => {
-    console.log('Request Body:', req.body);
+// Configure Multer for file uploads
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, 'HTML/uploads/road-closures')); // Adjusted path for upper-level directory
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${Date.now()}-${file.originalname}`); // Unique filename
+    },
+});
 
-    const { reporterName, roadAddress, roadAddress2, roadReason, startCoordinates, endCoordinates } = req.body;
+app.use('/HTML/uploads', express.static(path.join(__dirname, '../uploads')));
 
-    if (!reporterName || !roadAddress || !roadReason || !startCoordinates || !endCoordinates) {
-        return res.status(400).json({ error: 'All fields, including coordinates, are required.' });
-    }
+// Multer filter to accept only images
+const upload = multer({
+    storage: storage,
+    fileFilter: (req, file, cb) => {
+        const fileTypes = /jpeg|jpg|png|gif/;
+        const mimeType = fileTypes.test(file.mimetype);
+        const extName = fileTypes.test(path.extname(file.originalname).toLowerCase());
 
+        if (mimeType && extName) {
+            return cb(null, true);
+        }
+        cb(new Error('Only image files are allowed!'));
+    },
+});
+
+app.post('/api/report-road-closure', upload.array('closureImages'), async (req, res) => {
     try {
+        const { reporterName, roadAddress, roadAddress2, roadReason, startCoordinates, endCoordinates } = req.body;
+        const imagePaths = req.files
+            ? req.files.map(file => `/HTML/uploads/road-closures/${path.basename(file.path)}`)
+            : []; // Store web-accessible paths
+
+        // Validate fields
+        if (!reporterName || !roadAddress || !roadReason || !startCoordinates || !endCoordinates) {
+            return res.status(400).json({ error: 'All fields, including coordinates, are required.' });
+        }
+
+        // Prepare data for insertion
         const reportData = {
             reporterName,
             roadAddress,
             roadAddress2,
             roadReason,
-            startCoordinates,
-            endCoordinates,
+            startCoordinates: JSON.parse(startCoordinates),
+            endCoordinates: JSON.parse(endCoordinates),
+            imagePaths, // Store paths for serving via the static route
             createdAt: new Date(),
         };
 
-        const result = await client.db('RAPID').collection('roadClosures').insertOne(reportData);
+        const result = await roadClosures.insertOne(reportData);
 
         if (result.acknowledged) {
-            res.json({ success: true });
+            res.json({ success: true, imagePaths });
         } else {
             res.status(500).json({ error: 'Failed to submit road closure report.' });
         }
@@ -322,6 +429,64 @@ app.post('/api/report-road-closure', async (req, res) => {
         res.status(500).json({ error: 'An error occurred while submitting the report.' });
     }
 });
+
+app.post('/api/road-closure/:id/approve', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Validate ID format
+        if (!ObjectId.isValid(id)) {
+            return res.status(400).json({ error: 'Invalid road closure ID format.' });
+        }
+
+        // Find the road closure by ID
+        const roadClosure = await roadClosures.findOne({ _id: new ObjectId(id) });
+        if (!roadClosure) {
+            return res.status(404).json({ error: 'Road closure not found.' });
+        }
+
+        // Insert into approvedRoads
+        const approvedResult = await approvedRoadsCollection.insertOne({
+            ...roadClosure,
+            approvedAt: new Date(),
+        });
+
+        if (!approvedResult.acknowledged) {
+            return res.status(500).json({ error: 'Failed to approve road closure.' });
+        }
+
+        // Remove from roadClosures
+        const deleteResult = await roadClosures.deleteOne({ _id: new ObjectId(id) });
+        if (deleteResult.deletedCount === 0) {
+            return res.status(500).json({ error: 'Failed to remove the road closure from the original collection.' });
+        }
+
+        res.json({ success: true, message: 'Road closure approved successfully.' });
+    } catch (err) {
+        console.error('Error approving road closure:', err);
+        res.status(500).json({ error: 'An error occurred while approving the road closure.' });
+    }
+});
+
+// Reject a road closure
+app.post('/api/road-closure/:id/reject', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Find and delete the road closure by ID
+        const deleteResult = await roadClosures.deleteOne({ _id: new ObjectId(id) });
+        if (deleteResult.deletedCount === 0) {
+            return res.status(404).json({ error: 'Road closure not found or already deleted.' });
+        }
+
+        res.json({ success: true, message: 'Road closure rejected and removed successfully.' });
+    } catch (err) {
+        console.error('Error rejecting road closure:', err);
+        res.status(500).json({ error: 'An error occurred while rejecting the road closure.' });
+    }
+});
+
+
 app.delete('/delete-store-admin/:id', authenticate, async (req, res) => {
     const storeId = req.params.id;
     const { user } = req;  // Access the authenticated user

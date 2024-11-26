@@ -27,6 +27,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     displayStores2(); // Display stores in admin page table
                     document.getElementById("sortby1").addEventListener("change", fetchStores2);
                     document.getElementById("sortby2").addEventListener("change", fetchStores2);
+                    fetchAndDisplayRoadClosures();
+                    fetchAndDisplayApprovedRoads();
                 }
             })
             .catch(error => {
@@ -329,6 +331,10 @@ function clearStoreForm() {
     document.getElementById("storeHours").value = "";
     document.getElementById("contactNumber").value = "";
 
+    const radioButtons = document.querySelectorAll('input[type="radio"]');
+    radioButtons.forEach(radio => {
+        radio.checked = false;
+    });
 
     selectedStoreId = null; // Clear the selected store ID
     toggleButton(false); // Reset button to REGISTER mode
@@ -922,6 +928,362 @@ async function deleteStoreAdmin(storeId) {
     }
 }
 
+async function handleApprovalOrRejection(closureId, isApprove) {
+    console.log('Closure ID:', closureId); // Debugging
+
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        console.error('No authorization token found!');
+        return;
+    }
+
+    const action = isApprove ? 'approve' : 'reject';
+    const url = `${apiBaseUrl}/api/road-closure/${closureId}/${action}`;
+    console.log('Request URL:', url); // Debugging
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            const errorMessage = await response.text(); // Get detailed error message if available
+            console.error(`Error response from server: ${errorMessage}`);
+            throw new Error(`${action.toUpperCase()} action failed.`);
+        }
+
+        alert(`Road closure ${isApprove ? 'approved' : 'rejected'} successfully!`);
+
+        // Directly remove the closure element from the DOM
+        const closureElement = document.getElementById(`closure-${closureId}`);
+        if (closureElement) {
+            closureElement.remove(); // Remove the closure element from the DOM immediately
+        }
+
+        // Refresh the approved roads list
+        await fetchAndDisplayApprovedRoads();
+
+    } catch (error) {
+        console.error(`Error performing ${action} action:`, error);
+        alert(`Failed to ${action} the road closure.`);
+    }
+}
+
+
+async function fetchAndDisplayRoadClosures() {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        console.error('No authorization token found!');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${apiBaseUrl}/get-road-closures`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                console.error('Unauthorized: Invalid or expired token');
+            } else {
+                throw new Error('Failed to fetch road closures');
+            }
+        }
+
+        const roadClosures = await response.json();
+        const closureDiv = document.querySelector('.reportedRoadClosure');
+        closureDiv.innerHTML = ''; // Clear the div before displaying new content
+
+        if (roadClosures.length === 0) {
+            closureDiv.innerHTML = '<p>No road closures reported.</p>';
+        } else {
+            const table = document.createElement('table');
+            table.classList.add('road-closures-table');
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Reported Accident</th>
+                        <th>Details</th>
+                        <th>Approve</th>
+                        <th>Reject</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${roadClosures.map(closure => `
+                        <tr id="closure-${closure._id}">
+                            <td>${closure.roadReason}</td>
+                            <td><button class="view-button" data-id="${closure._id}">VIEW</button></td>
+                            <td><button class="approve-button" data-id="${closure._id}">APPROVE</button></td>
+                            <td><button class="reject-button" data-id="${closure._id}">REJECT</button></td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            `;
+
+            closureDiv.appendChild(table);
+
+            // Add event listeners for View, Approve, and Reject buttons
+            document.querySelectorAll('.view-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const closureId = e.target.getAttribute('data-id');
+                    showClosureDetailsPopup(closureId);
+                    fetchAndDisplayApprovedRoads();
+                });
+            });
+
+            document.querySelectorAll('.approve-button').forEach(button => {
+                button.addEventListener('click', async (e) => {
+                    const closureId = e.target.getAttribute('data-id');
+                    await handleApprovalOrRejection(closureId, true); // Approve
+                });
+            });
+
+            document.querySelectorAll('.reject-button').forEach(button => {
+                button.addEventListener('click', async (e) => {
+                    const closureId = e.target.getAttribute('data-id');
+                    await handleApprovalOrRejection(closureId, false); // Reject
+                });
+            });
+        }
+    } catch (error) {
+        console.error('Error fetching and displaying road closures:', error);
+    }
+}
+
+
+async function showClosureDetailsPopup(closureId) {
+    const token = localStorage.getItem('authToken'); // Retrieve the token from localStorage
+    if (!token) {
+        console.error('No authorization token found!');
+        return; // Stop execution if no token is found
+    }
+
+    console.log("Closure ID:", closureId);  // Log the closureId for debugging
+
+    if (!closureId) {
+        console.error('No closure ID provided!');
+        return; // Prevent the request if closureId is undefined
+    }
+
+    try {
+        const response = await fetch(`${apiBaseUrl}/get-road-closure/${closureId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`, // Add the Bearer token to the headers
+                'Content-Type': 'application/json'
+            }
+        });
+
+        // Check if the request was successful
+        if (!response.ok) {
+            if (response.status === 401) {
+                console.error('Unauthorized: Invalid or expired token');
+            } else {
+                throw new Error('Failed to fetch road closure details');
+            }
+        }
+
+        const closure = await response.json();
+
+        // Create a popup to display the details
+        const popup = document.createElement('div');
+        popup.classList.add('closure-popup');
+        popup.innerHTML = `
+            <div class="popup-content">
+                <h3>Road Closure Details</h3>
+                <p><strong>Reported by:</strong> ${closure.reporterName}</p>
+                <p><strong>Road Address:</strong> ${closure.roadAddress} ${closure.roadAddress2 ? ` going to ${closure.roadAddress2}` : ''}</p>
+                <p><strong>Reason for Closure:</strong> ${closure.roadReason}</p>
+                ${closure.imagePaths && closure.imagePaths.length > 0 ? 
+                    `<div class="images"><strong>Closure Image:</strong><br>
+                        ${closure.imagePaths.map(img => `<img src="${img}" alt="Road closure image" class="closure-image">`).join('')}
+                    </div>` : ''
+                }
+                <button class="close-popup">Close</button>
+            </div>
+        `;
+
+        document.body.appendChild(popup);
+
+        // Close the popup when the button is clicked
+        const closeButton = popup.querySelector('.close-popup');
+        closeButton.addEventListener('click', () => {
+            document.body.removeChild(popup);
+        });
+
+    } catch (error) {
+        console.error('Error fetching and displaying closure details:', error);
+    }
+}
+
+let approvedRoads = []; // Store the fetched roads globally
+async function fetchAndDisplayApprovedRoads() {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        console.error('No authorization token found!');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${apiBaseUrl}/get-approved-roads`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                console.error('Unauthorized: Invalid or expired token');
+            } else {
+                throw new Error('Failed to fetch approved roads');
+            }
+        }
+
+        approvedRoads = await response.json(); // Store the approved roads
+        const roadsDiv = document.querySelector('.roadReopen'); // Replace with your actual div class
+        roadsDiv.innerHTML = ''; // Clear the div before displaying new content
+
+        if (approvedRoads.length === 0) {
+            roadsDiv.innerHTML = '<p>No approved roads found.</p>';
+        } else {
+            const table = document.createElement('table');
+            table.classList.add('approved-roads-table');
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Reported Accident</th>
+                        <th>Details</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${approvedRoads.map(road => `
+                        <tr id="road-${road._id}">
+                            <td>${road.roadReason}</td>
+                            <td><button class="view-button2" data-id="${road._id}">VIEW</button></td>
+                            <td><button class="delete-button" data-id="${road._id}">REOPEN</button></td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            `;
+
+            roadsDiv.appendChild(table);
+
+            // Add event listeners for View buttons
+            document.querySelectorAll('.view-button2').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const roadId = e.target.getAttribute('data-id');
+                    showRoadDetailsPopup(roadId); // Fetch details from the local `approvedRoads` array
+                });
+            });
+
+            // Add event listeners for Delete buttons
+            document.querySelectorAll('.delete-button').forEach(button => {
+                button.addEventListener('click', async (e) => {
+                    const roadId = e.target.getAttribute('data-id');
+                    await deleteApprovedRoad(roadId);
+                });
+            });
+        }
+    } catch (error) {
+        console.error('Error fetching and displaying approved roads:', error);
+    }
+}
+
+// Function to delete an approved road
+async function deleteApprovedRoad(roadId) {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        console.error('No authorization token found!');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${apiBaseUrl}/delete-road/${roadId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                console.error('Unauthorized: Invalid or expired token');
+            } else {
+                throw new Error('Failed to delete road');
+            }
+        }
+        alert(`Road reopened!`);
+        console.log(`Road with ID ${roadId} deleted successfully`);
         
+        // Remove the deleted road's row from the table
+        const row = document.getElementById(`road-${roadId}`);
+        if (row) {
+            row.remove();
+        }
+    } catch (error) {
+        console.error('Error deleting road:', error);
+    }
+}
+
+async function showRoadDetailsPopup(roadId) {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        console.error('No authorization token found!');
+        return;
+    }
+
+    console.log("Road ID:", roadId);  // Log the roadId for debugging
+
+    if (!roadId) {
+        console.error('No road ID provided!');
+        return;
+    }
+
+    // Find the road with the given roadId in the approvedRoads array
+    const road = approvedRoads.find(r => r._id === roadId);
+
+    if (!road) {
+        console.error('Road not found!');
+        return;
+    }
+
+    // Create a popup to display the details
+    const popup = document.createElement('div');
+    popup.classList.add('road-popup');
+    popup.innerHTML = `
+        <div class="popup-content">
+            <h3>Road Details</h3>
+            <p><strong>Reported by:</strong> ${road.reporterName}</p>
+            <p><strong>Road Address:</strong> ${road.roadAddress} ${road.roadAddress2 ? ` going to ${road.roadAddress2}` : ''}</p>
+            <p><strong>Reason for Approval:</strong> ${road.roadReason}</p>
+            ${road.imagePaths && road.imagePaths.length > 0 ? 
+                `<div class="images"><strong>Closure Image:</strong><br>
+                    ${road.imagePaths.map(img => `<img src="${img}" alt="Road image" class="road-image">`).join('')}
+                </div>` : ''
+            }
+            <button class="close-popup">Close</button>
+        </div>
+    `;
+
+    document.body.appendChild(popup);
+
+    // Close the popup when the button is clicked
+    const closeButton = popup.querySelector('.close-popup');
+    closeButton.addEventListener('click', () => {
+        document.body.removeChild(popup);
+    });
+}
 
 window.onload = fetchSupplies();

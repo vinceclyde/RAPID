@@ -37,6 +37,7 @@
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
     padding: 5px 10px;
     margin: 0; 
+    background-color: white;
 }
 
 
@@ -91,6 +92,7 @@
     width: 100%;
     position: relative; /* Ensure child elements like pagination are positioned relative to this container */
     overflow-x: auto; /* Allow horizontal scrolling if needed */
+    background-color: white;
 }
 
 
@@ -132,7 +134,7 @@ th {
     line-height: 25px;  /* Vertically center text */
 }
 /* Edit Button */
-.edit-button {
+.view-button, .edit-button, .approve-button, .reject-button, .view-button2, .delete-button {
     background-color: #303C6C;
     width: 100px;
     color: white;
@@ -144,7 +146,7 @@ th {
     font-size: 10px;
 }
 
-.edit-button:hover {
+.view-button:hover, .edit-button:hover, .approve-button:hover, .reject-button:hover, .view-button2:hover, .delete-button:hover {
     background-color: #202a48;
 }
 
@@ -213,6 +215,10 @@ th {
 
 .reportedRoadClosure {
     background-color: #FBE8A6;
+}
+
+.roadReopen {
+    background-color: #D1FDFE;
 }
 
 @media (max-width: 1024px) {

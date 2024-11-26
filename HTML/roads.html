@@ -68,7 +68,17 @@
         left: 0;               
         margin-top: 50px;
     }
-    
+    .supply2 {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        justify-content: center;
+        border: 1.5px solid black;
+        border-radius: 15px;
+        width: 50%;
+        margin: 10px 0 10px 0;
+        padding: 10px;
+    }
 
     #startSuggestions li, #endSuggestions li {
     padding: 8px 10px;      /* Add padding around each suggestion */
@@ -77,6 +87,27 @@
 
 #startSuggestions li:hover , #endSuggestions li:hover {
     background-color: #f0f0f0; /* Optional: Highlight on hover */
+}
+
+#closureImages {
+    opacity: 1; /* Makes the input invisible */
+    width: 0;   /* Removes width */
+    height: 0;  /* Removes height */
+    position: absolute; /* Ensures it's off the visible flow */
+}
+
+.label {
+    cursor: pointer; /* Make the label look clickable */
+}
+.upload {
+    opacity: 0;
+}
+.uploadImage {
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
+.uploadImage:hover {
+    transform: translateY(-10px); /* Move up by 10px */
 }
 
     
@@ -112,7 +143,12 @@
                         <label><input type="radio" name="roadReason" value="Electrical Repair"> Electrical Repair</label><br>
                         <label><input type="radio" name="roadReason" value="Flooding"> Flooding</label><br>
                     </fieldset><br>
+                    <div class="supply2">
+        <input type="file" id="closureImages" na me="closureImages" multiple accept="image/*"><br>
+        <label class="label" for="closureImages"><img class="uploadImage" src="https://i.ibb.co/pJCSbjf/image.png" width="50px" height="50px"></label>
+        </div>
                 </div>
+
                 <div class="centerDiv2">
                     <div id="clear-roads-btn" class="submitButton">Clear Roads</div>
                     <div  id="clear-markers-btn" class="submitButton">Clear Markers</div>
@@ -378,7 +414,6 @@ function setupAddressInput(inputId, suggestionsId, isStartPoint) {
 setupAddressInput('roadAddress', 'startSuggestions', true); // Starting point
 setupAddressInput('roadAddress2', 'endSuggestions', false); // Ending point
 
-
 async function submitRoadClosure(event) {
     event.preventDefault(); // Prevent the form from reloading the page
 
@@ -386,6 +421,7 @@ async function submitRoadClosure(event) {
     const roadAddress = document.getElementById('roadAddress').value.trim();
     const roadAddress2 = document.getElementById('roadAddress2').value.trim();
     const roadReason = document.querySelector('input[name="roadReason"]:checked')?.value;
+    const closureImages = document.getElementById('closureImages').files;
 
     // Validate required fields
     if (!reporterName || !roadAddress || !roadAddress2 || !roadReason) {
@@ -400,28 +436,30 @@ async function submitRoadClosure(event) {
         alert('Please set both starting and ending points on the map.');
         return;
     }
+    const formData = new FormData();
+formData.append('reporterName', reporterName);
+formData.append('roadAddress', roadAddress);
+formData.append('roadAddress2', roadAddress2);
+formData.append('roadReason', roadReason);
+formData.append('startCoordinates', JSON.stringify({ lat: startCoordinates.lat, lng: startCoordinates.lng }));
+formData.append('endCoordinates', JSON.stringify({ lat: endCoordinates.lat, lng: endCoordinates.lng }));
 
-    const data = {
-        reporterName,
-        roadAddress,
-        roadAddress2,
-        roadReason,
-        startCoordinates: { lat: startCoordinates.lat, lng: startCoordinates.lng },
-        endCoordinates: { lat: endCoordinates.lat, lng: endCoordinates.lng },
-    };
+// Add all images to FormData with the key 'closureImages'
+for (let i = 0; i < closureImages.length; i++) {
+    formData.append('closureImages', closureImages[i]);
+}
+
 
     try {
         const response = await fetch('http://localhost:5000/api/report-road-closure', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-});
+            method: 'POST',
+            body: formData,
+        });
 
         const result = await response.json();
         if (response.ok) {
             alert('Road closure report submitted successfully!');
+            window.close();
             // Optionally reset the form and map markers
             document.getElementById('roadClosure').reset();
             if (startMarker) map.removeLayer(startMarker);
@@ -438,6 +476,7 @@ async function submitRoadClosure(event) {
         alert('An error occurred while submitting the report. Please try again.');
     }
 }
+
 
 
     </script>
