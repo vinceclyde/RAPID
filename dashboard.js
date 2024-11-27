@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     document.getElementById("locatorMap").addEventListener("click", () => {
-        loadContent("locator.html");
+        window.open("locatorsample.html");
     });
 
     document.getElementById("roadClosure").addEventListener("click", () => {

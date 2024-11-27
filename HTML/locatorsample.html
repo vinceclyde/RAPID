@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Locate a Supply</title>
+    <link rel="icon" href="https://i.ibb.co/XCjDk5m/placeholder.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+    <style>
+        .MapContainerBig {
+            height: 88vh;
+            padding: 20px;
+            width: 50%;
+            border-radius: 15px;
+            border: solid black 1.5px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); 
+        }
+        body {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+        .regStoreCon1 {
+            gap: 50px;
+    font-family: 'Inter';
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    border: solid black 1.5px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    height: 88vh;
+    width: 35%;
+    padding: 20px;
+    position: relative;  /* Add relative position */
+}
+
+#address-suggestions {
+    display: none;
+    max-height: 200px;      /* Set a fixed height for the suggestions container */
+    overflow-y: auto;       /* Make it scrollable if the content exceeds the height */
+    background-color: #fff; /* Optional: Add a background to differentiate from the page */
+    border: 1px solid #ccc; /* Optional: Add a border for visual separation */
+    border-radius: 4px;     /* Optional: Round the corners */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+    font-size: 14px;        /* Set a smaller font size */
+    padding: 5px 0;         /* Adjust padding */
+    position: absolute;     /* Make sure it appears over other content */
+    z-index: 999;           /* Ensure it appears on top of other content */
+    width: 100%;            /* Make the width match the input field */
+    left: 0;                /* Align it to the left edge of the parent container */
+}
+#address-suggestions div {
+    padding: 10px 20px; /* Adjust padding for each suggestion (10px top/bottom, 20px left/right) */
+    cursor: pointer;    /* Change cursor to pointer to indicate clickable items */
+    font-size: 14px;     /* Optional: Adjust font size for better readability */
+}
+
+#address-suggestions div:hover {
+    background-color: #f0f0f0; /* Highlight suggestion on hover */
+}
+
+
+        .address-field {
+            margin-top: 5px;
+            border-radius: 15px;
+            font-family: 'Inter';
+            border: 1.5px solid black;
+            font-size: 15px;
+            width: 95%;
+            padding: 10px;
+            justify-content: space-evenly;
+        }
+
+        .addressCon {
+    position: relative;     /* Ensure the suggestions list is positioned correctly within this container */
+    width: 100%;            /* Make the container take full available width */
+}
+.locCon {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    margin-top: 10px;
+}
+
+
+.submitButton {
+    margin-top: 20px;
+    width: 150px;
+    font-family: 'Inter';
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 15px;
+    background-color: #f4976c;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.5s ease;
+}
+
+.submitButton:hover {
+    background-color: black;
+}
+.label {
+    font-family: 'Inter';
+    font-size: 15px;  
+}
+.supply {
+    font-family: 'Inter';
+    border: none;
+    font-size: 15px;
+}
+.buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+
+.locationButton {
+    font-family: 'Inter';
+    border-radius: 15px;
+    font-size: 10px;
+    background-color: #f4976c;
+    color: white;
+    border: none;
+    width: 30%;
+    padding: 5px;
+    transition: background-color 0.5s ease;
+    cursor: pointer;
+}
+
+.locationButton:hover {
+    background: black;
+    color: white;
+}
+
+.leaflet-popup-content {
+        font-family: 'Inter', sans-serif;
+        font-size: 14px; /* Optional: Adjust font size */
+    }
+
+    </style>
+</head>
+<body>
+    <div class="regStoreCon1">
+        <div class="addressCon">
+        <label for="address" class="label">Enter Address: </label>
+        <input class="address-field" type="text" id="address" placeholder="Search for an address..." autocomplete="off">
+        <ul id="address-suggestions"></ul>
+
+        <div class="locCon"><button type="button" class="locationButton" onclick="useCurrentLocation()">Use My Location</button></div>
+    </div>
+    <div class="addressCon">
+        <label for="supply-type">Select Supply Type: </label>
+        <div class="address-field">
+        <select class="supply" id="supply-type">
+            <option value="Medical">Medical</option>
+            <option value="Food">Food</option>
+            <option value="Water">Water</option>
+            <option value="Gas">Gas</option>
+        </select>
+    </div>
+</div>
+<div class="buttons">
+<button class="submitButton" id="reset-btn">Reset Marker</button>
+<button class="submitButton" id="submit-btn">Find Route</button>
+</div>
+
+    </div>
+
+    <div class="MapContainerBig" id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+    <script>
+        const token = localStorage.getItem('authToken'); // Retrieve the JWT token
+
+        // Initialize map centered on Batangas City (13.7565, 121.0583)
+        var map = L.map('map').setView([13.7565, 121.0583], 13); // Batangas City coordinates
+
+        // Tile Layer for the map
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        let userLocation = null; // Variable to store the user’s location
+        let routeControl = null; // To store the route control to reset the route
+        let userMarker = null;  // To store the user's marker
+        let markerPlaced = false; // Flag to track if marker is placed
+
+        const userLocationIcon = L.icon({
+    iconUrl: 'styles/assets/user.png',  // Replace with your custom icon URL
+    iconSize: [40, 40],  // Adjust the size of the icon
+    iconAnchor: [20, 40], // Position the icon so the tip of the icon is at the location
+    popupAnchor: [0, -40] // Position the popup above the icon
+});
+
+const roadIcon = L.icon({
+    iconUrl: 'styles/assets/road_icon.png',  // Replace with your custom icon URL
+    iconSize: [40, 40],  // Adjust the size of the icon
+    iconAnchor: [20, 40], // Position the icon so the tip of the icon is at the location
+    popupAnchor: [0, -40] // Position the popup above the icon
+});
+        function useCurrentLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (position) => {
+            const { latitude, longitude } = position.coords;
+
+            const apiKey = "AIzaSyBuKitXZZvPXjHXVebv0bVBrEpdj4dFhH8"; // Replace with your API key
+            const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.results && data.results[0]) {
+                    const address = data.results[0].formatted_address;
+                    document.getElementById("address").value = address;
+
+                    // Set map view to current location and add marker
+                    map.setView([latitude, longitude], 15);
+
+                    // Remove the previous marker if it exists
+                    if (userMarker) {
+                        map.removeLayer(userMarker);
+                    }
+
+                    // Create a new marker with the dynamic location info
+                    userMarker = L.marker([latitude, longitude], { icon: userLocationIcon }).addTo(map)
+                    .bindPopup(`Your location: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`)
+                        .openPopup();
+
+                    // Store user location
+                    userLocation = { lat: latitude, lon: longitude };
+                } else {
+                    alert("Unable to fetch address. Please try again.");
+                }
+            } catch (error) {
+                console.error("Error fetching location data:", error);
+                alert("An error occurred while retrieving your location.");
+            }
+        }, (error) => {
+            console.error("Geolocation error:", error);
+            alert("Unable to access location. Please enable location services.");
+        });
+    } else {
+        alert("Geolocation is not supported by your browser.");
+    }
+}
+
+        // Function to fetch supplies and approved roads
+        async function fetchSuppliesAndRoads() {
+            try {
+                const responseSupplies = await fetch('http://localhost:5000/get-supplies', {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${token}` } // Send token in the header
+                });
+                const supplies = await responseSupplies.json();
+                console.log('Supplies:', supplies); // Debugging: Check if supplies data is correct
+
+                const responseRoads = await fetch('http://localhost:5000/get-approved-roads', {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${token}` } // Send token in the header
+                });
+                const roads = await responseRoads.json();
+                console.log('Roads:', roads); // Debugging: Check if roads data is correct
+
+                // Add approved roads to map with markers and polyline
+                roads.forEach(road => {
+                    const start = road.startCoordinates;
+                    const end = road.endCoordinates;
+                    if (start && end) { // Ensure valid coordinates
+                        L.polyline([start, end], { color: 'blue' }).addTo(map)
+                        L.marker(start, { icon: roadIcon }).addTo(map)
+                        .bindPopup(`<b>Start of Accident Vicinity:</b><br>${road.roadAddress}<br><b>Reason:</b> ${road.roadReason}`);
+
+                        L.marker(end, { icon: roadIcon }).addTo(map)
+                        .bindPopup(`<b>End of Accident Vicinity:</b><br>${road.roadAddress}<br><b>Reason:</b> ${road.roadReason}`);
+
+                    }
+                });
+
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        }
+
+// Function to handle map click to set user's location
+map.on('click', function (e) {
+    if (markerPlaced) {
+        alert("You can only place one marker. Please reset the marker before placing a new one.");
+        return;
+    }
+
+    if (userMarker) {
+        map.removeLayer(userMarker);
+    }
+
+    userLocation = { lat: e.latlng.lat, lon: e.latlng.lng }; // Set the user location to clicked coordinates
+    console.log('User Location (clicked):', userLocation);
+
+    userMarker = L.marker(e.latlng, { icon: userLocationIcon }).addTo(map)
+    .bindPopup('Your location')
+    .openPopup();
+    markerPlaced = true;
+
+    // Use Nominatim API to reverse geocode the clicked coordinates to get the address
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}&addressdetails=1`)
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.display_name) {
+                document.getElementById('address').value = data.display_name; // Update the address field with the retrieved address
+            } else {
+                document.getElementById('address').value = 'Address not found'; // Default message if no address is found
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching address:', error);
+            document.getElementById('address').value = 'Error fetching address'; // Default message in case of error
+        });
+});
+
+// Updated Find Route button click handler
+document.getElementById('submit-btn').addEventListener('click', function () {
+    if (!userLocation) {
+        alert("Please select a location on the map first.");
+        return;
+    }
+
+    const userLat = userLocation.lat;
+    const userLon = userLocation.lon;
+    findNearestSupply(userLat, userLon); // Call findNearestSupply with the current user location
+});
+
+function findNearestSupply(userLat, userLon) {
+    const supplyType = document.getElementById('supply-type').value;
+
+    fetch('http://localhost:5000/get-supplies', {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${token}` }
+    })
+    .then(response => response.json())
+    .then(supplies => {
+        let nearestStore = null;
+        let nearestDistance = Infinity;
+
+        supplies.forEach(supply => {
+            if (supply._id === supplyType) {
+                supply.supplies.forEach(store => {
+                    // Only consider stores that are not Out of Stock
+                    if (store.latitude && store.longitude && store.supplyStatus !== "Out Of Stock") {
+                        const distance = getDistance(userLat, userLon, store.latitude, store.longitude);
+                        if (distance < nearestDistance) {
+                            nearestDistance = distance;
+                            nearestStore = store;
+                        }
+                    }
+                });
+            }
+        });
+
+        if (nearestStore) {
+            console.log('Nearest Store:', nearestStore);
+
+            routeControl = L.Routing.control({
+                waypoints: [
+                    L.latLng(userLat, userLon),
+                    L.latLng(nearestStore.latitude, nearestStore.longitude)
+                ],
+                routeWhileDragging: true
+            }).addTo(map);
+
+            // Use custom marker based on supply type
+            const customMarker = createCustomMarker(supplyType);
+
+            const nearestMarker = L.marker([nearestStore.latitude, nearestStore.longitude], { icon: customMarker })
+                .bindPopup(`<b>${nearestStore.name}</b><br>Supply Status: ${nearestStore.supplyStatus}<br>Supply Type: ${supplyType}`)
+                .addTo(map);
+
+            nearestMarker.openPopup();
+        } else {
+            console.log('No supply stores found for this type.');
+            alert('No supply stores found for this type.');
+        }
+    })
+    .catch(error => console.error('Error fetching supplies:', error));
+}
+
+document.getElementById('reset-btn').addEventListener('click', function() {
+    if (userMarker) {
+        map.removeLayer(userMarker); // Remove the current marker from the map
+    }
+    userMarker = null; // Clear the marker reference
+    userLocation = null; // Clear the user location
+    markerPlaced = false; // Reset the marker placed flag
+
+    // Optionally, reset the address field
+    document.getElementById('address').value = '';
+
+    // Optionally, clear any active route
+    if (routeControl) {
+        map.removeControl(routeControl); // Remove the route control from the map
+    }
+    routeControl = null; // Reset the route control reference
+});
+
+
+//Dashboard map markers
+function createCustomMarker(status) {
+    let iconUrl;
+
+    switch (status) {
+        case 'Food':
+            iconUrl = 'styles/assets/food_icon.png';  
+            break;
+        case 'Medical':
+            iconUrl = 'styles/assets/medic_icon.png';  
+            break;
+        case 'Gas':
+            iconUrl = 'styles/assets/gas_icon.png';  
+            break;
+        case 'Water':
+            iconUrl = 'styles/assets/water_icon.png';  
+            break;
+        default:
+            iconUrl = 'styles/assets/black.png';  
+            break;
+    }
+
+    return new L.Icon({
+        iconUrl: iconUrl,
+        iconSize: [40, 40], 
+        iconAnchor: [20, 40],  
+        popupAnchor: [0, -40],  // Adjust for the popup positio
+    });
+}
+
+
+        // Function to calculate the distance between two coordinates using Haversine formula
+        function getDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c; // Distance in kilometers
+        }
+        document.getElementById('address').addEventListener('input', function() {
+    const query = this.value;
+
+    if (query.length < 3) {
+        document.getElementById('address-suggestions').style.display = 'none'; // Hide suggestions when input is too short
+        return;
+    }
+
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data); // Log data to check the response
+            const suggestionsDiv = document.getElementById('address-suggestions');
+            suggestionsDiv.innerHTML = '';  // Clear previous suggestions
+            
+
+            if (data.length === 0) {
+                suggestionsDiv.style.display = 'none'; // Hide if no suggestions
+                return;
+            }
+
+            suggestionsDiv.style.display = 'block'; // Show suggestions when data is available
+
+            data.forEach(address => {
+                const suggestion = document.createElement('div');
+                suggestion.textContent = address.display_name;
+                suggestion.addEventListener('click', function() {
+                    const selectedLat = address.lat;
+                    const selectedLon = address.lon;
+                    document.getElementById('address').value = address.display_name;
+                    userLocation = { lat: selectedLat, lon: selectedLon };
+                    if (userMarker) {
+                        map.removeLayer(userMarker);
+                    }
+                    userMarker = L.marker([selectedLat, selectedLon], { icon: userLocationIcon }).addTo(map)
+    .bindPopup('Selected address')
+    .openPopup();
+                    suggestionsDiv.innerHTML = '';  // Clear suggestions after selection
+                    suggestionsDiv.style.display = 'none';
+
+                });
+                suggestionsDiv.appendChild(suggestion);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching address suggestions:', error);
+            document.getElementById('address-suggestions').style.display = 'none'; // Hide suggestions on error
+        });
+});
+
+
+
+        // Fetch supplies and roads initially
+        fetchSuppliesAndRoads();
+    </script>
+</body>
+</html>
