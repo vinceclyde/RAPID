@@ -308,3 +308,108 @@
         background-image: url('assets/alert.png');
     }
 }
+
+
+/* Small screens, like phones */
+@media (max-width: 600px) {
+    .alertCenterContainer {
+        flex-direction: column;
+        height: 100vh;
+        width: 90vw;
+    }
+
+    .supplyShortageLayout,
+    .roadUpdatesLayout {
+        width: 100%;
+    }
+
+    .supplyShortageContainer, 
+    .roadUpdatesContainer {
+        height: auto;
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    .SupplyLayout, 
+    .roadClosedLayout, 
+    .roadReOpenLayout {
+        width: 100%;
+    }
+
+    .runningLow, 
+    .outofStock {
+        width: 100%;
+        height: auto;
+    }
+
+    .roadContainer {
+        height: auto;
+        width: 100%;
+        max-width: none;
+    }
+}
+
+/* Medium screens, like tablets */
+@media (min-width: 601px) and (max-width: 1024px) {
+    .alertCenterContainer {
+        flex-direction: row;
+        height: 80vh;
+        width: 80vw;
+        gap: 10px;
+    }
+
+    .supplyShortageLayout {
+        width: 60%;
+    }
+
+    .roadUpdatesLayout {
+        width: 40%;
+    }
+
+    .supplyShortageContainer, 
+    .roadUpdatesContainer {
+        height: 75vh;
+    }
+
+    .SupplyLayout, 
+    .roadClosedLayout, 
+    .roadReOpenLayout {
+        width: 90%;
+    }
+
+    .runningLow, 
+    .outofStock {
+        width: 90%;
+        height: auto;
+    }
+
+    .roadContainer {
+        height: auto;
+        width: 90%;
+        max-width: 400px;
+    }
+}
+
+/* Extra-large screens, like large desktops or TVs */
+@media (min-width: 1440px) {
+    .alertCenterContainer {
+        gap: calc(4vw + 25px);
+    }
+
+    .supplyShortageLayout {
+        width: 70%;
+    }
+
+    .roadUpdatesLayout {
+        width: 30%;
+    }
+
+    .runningLow, 
+    .outofStock {
+        width: 75%;
+    }
+
+    .roadContainer {
+        max-width: 600px;
+    }
+}
