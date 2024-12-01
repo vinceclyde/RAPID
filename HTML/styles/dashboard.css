@@ -263,53 +263,6 @@ body {
     width: 100%;
 }
 
-@media (max-width: 600px) {
-    .navBar {
-        width: 15%;
-    }
-
-    .navBarText {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0; /* Hide text while keeping spacing */
-        margin-right: 20px;
-        margin-top: 40px;
-    }
-
-    .icon {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-    }
-    
-    .iconDiv {
-        display: flex;
-        flex-direction: column;
-        margin-top: auto;
-        margin-bottom: 30px;
-        gap: 20px;
-    }
-    /* Custom icons for each item */
-    #dashboard .icon {
-        background-image: url('assets/dashboard.png');
-    }
-    #locatorMap .icon {
-        background-image: url('assets/locator.png');
-    }
-    #storeRegistration .icon {
-        background-image: url('assets/register.png');
-    }
-    #roadClosure .icon {
-        background-image: url('assets/road.png');
-    }
-    #alertCenter .icon {
-        background-image: url('assets/alert.png');
-    }
-}
 
 #suggestions {
     display: none;
