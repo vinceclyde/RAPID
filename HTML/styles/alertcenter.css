@@ -82,12 +82,18 @@
     justify-content: center;
 }
 
-.runningLow p, .outofStock p {
+.runningLow p, .outofStock p, ul {
     position: absolute;
     font-size: 12px; 
     font-weight: bold;
     font-family: 'Inter', sans-serif; 
     color: #333;
+}
+
+ul {                                            /*Added useless CSS para lang pumantay yung fetch data    */
+    margin-top: 3%;
+    margin-left: -2%;
+    font-size: 10px;
 }
 
 .supplystatustitle p {

@@ -52,8 +52,9 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     document.getElementById("alertCenter").addEventListener("click", () => {
-        loadContent("alert-center.html");
+        window.open("alert-center.html", "_blank");
     });
+    
 
     document.getElementById("locatorMap").addEventListener("click", () => {
         window.open("locatorsample.html");
@@ -709,6 +710,7 @@ async function fetchSupplies() {
 }
 
 
+
 //Dashboard map markers
 function createCustomMarker(status) {
     let iconUrl;
@@ -1287,3 +1289,4 @@ async function showRoadDetailsPopup(roadId) {
 }
 
 window.onload = fetchSupplies();
+window.onload = fetchSupplies1();
