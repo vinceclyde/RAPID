@@ -71,6 +71,21 @@
 
 ### <a name="preview"></a>
 ## 🫣 Preview
+<div align="center">
+  <table>
+    <tr>
+      <td><img src="https://i.ibb.co/TkhVGzC/preview4.png" width="400px"></td>
+      <td><img src="https://i.ibb.co/Mpd6btj/preview3.png" width="400px"></td>
+    </tr>
+    <tr>
+      <td><img src="https://i.ibb.co/9yzxFZW/preview2.png" width="400px"></td>
+      <td><img src="https://i.ibb.co/GHxQtNg/preview1.png" width="400px"></td>
+    </tr>
+  </table>
+</div>
+
+
+
 
 ### <a name="members"></a>
 ## :shipit: Member Portfolio
