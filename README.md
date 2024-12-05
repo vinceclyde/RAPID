@@ -71,6 +71,10 @@
 
 ### <a name="preview"></a>
 ## 🫣 Preview
+<div style="border: 2px solid black; width: fit-content; display: inline-block;">
+  <img src="https://i.ibb.co/h1qMQgF/preview1.png" style="display: block;">
+</div>
+
 
 ### <a name="members"></a>
 ## :shipit: Member Portfolio
