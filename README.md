@@ -74,15 +74,14 @@
 <div align="center">
   <table>
     <tr>
-      <td><img src="https://i.ibb.co/TkhVGzC/preview4.png" width="400px"></td>
-      <td><img src="https://i.ibb.co/Mpd6btj/preview3.png" width="400px"></td>
-    </tr>
-    <tr>
-      <td><img src="https://i.ibb.co/9yzxFZW/preview2.png" width="400px"></td>
-      <td><img src="https://i.ibb.co/GHxQtNg/preview1.png" width="400px"></td>
+      <td><img src="https://i.ibb.co/bQ8bj7R/image.png" width="150"></td>
+      <td><img src="https://i.ibb.co/jHYdTd6/image.png" width="150"></td>
+      <td><img src="https://i.ibb.co/b5MF3yM/image.png" width="150"></td>
+      <td><img src="https://i.ibb.co/tzqXFGG/image.png" width="150"></td>
     </tr>
   </table>
 </div>
+
 
 
 
