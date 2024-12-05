@@ -71,9 +71,21 @@
 
 ### <a name="preview"></a>
 ## 🫣 Preview
-<div style="border: 2px solid black; width: fit-content; display: inline-block;">
-  <img src="https://i.ibb.co/h1qMQgF/preview1.png" style="display: block;">
+<div align="center">
+  <table>
+    <tr>
+      <td><img src="https://i.ibb.co/vJTJK71/preview4-modified.png" width="400px"></td>
+      <td><img src="https://i.ibb.co/pR7SjWH/preview3-modified.png" width="400px"></td>
+    </tr>
+    <tr>
+      <td><img src="https://i.ibb.co/99543tg/preview2-modified.png" width="400px"></td>
+      <td><img src="https://i.ibb.co/yR8p38Z/preview1-modified.png" width="400px"></td>
+    </tr>
+  </table>
 </div>
+
+
+
 
 
 ### <a name="members"></a>
