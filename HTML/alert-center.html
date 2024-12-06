@@ -79,91 +79,11 @@
                     </div>
                 </div>
             </div>
-<!-- 
-            <div class="roadUpdatesLayout">
-                <div class="supplyShortageTitle">
-                    <h2>Road Updates</h2>
-                </div>
-                <div class="roadUpdatesContainer">
-                    <div class="roadClosedLayout">
-                        <div class="roadTitle">
-                            <h4>Road Closed</h4>
-                        </div>
-                        <div class="roadContainer"></div>
-                    </div>
-                    <div class="roadReOpenLayout">
-                        <div class="roadTitle">
-                            <h4>Road Closed</h4>
-                        </div>
-                        <div class="roadContainer"></div>
-                    </div>
-                </div>
-            </div>
-            -->
+
         </div>
     </div>
-    <script>
-        async function fetchSupplyShortages() {
-            const apiBaseUrl = 'http://localhost:5000';         // Added this on this html page but can be omitted once transferred to dashboard.js
-            const token = localStorage.getItem('authToken');
-            if (!token) {
-                alert('No token found. Please log in again.');
-                return;
-            }
+    <script src="../dashboard.js"></script>
 
-            try {
-                const response = await fetch(`${apiBaseUrl}/get-supplies`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                });
-
-                const data = await response.json();
-                console.log("API Response:", data); // Debugging line
-
-                if (!response.ok) {
-                    throw new Error(data.error || 'Failed to fetch supplies.');
-                }
-
-                // Clear existing lists
-                ['water', 'gas', 'medical', 'food'].forEach(supplyType => {
-                    document.getElementById(`${supplyType}-limited`).innerHTML = '';
-                    document.getElementById(`${supplyType}-outofstock`).innerHTML = '';
-                });
-
-                // Process the grouped API response
-                data.forEach(group => {
-                    const supplyType = group._id.toLowerCase(); // e.g., "Water" -> "water"
-                    group.supplies.forEach(supply => {
-                        const { name, supplyStatus } = supply;
-
-                        const listId =
-                            supplyStatus === 'Limited'
-                                ? `${supplyType}-limited`
-                                : supplyStatus === 'Out Of Stock'
-                                    ? `${supplyType}-outofstock`
-                                    : null;
-
-                        if (listId) {
-                            const list = document.getElementById(listId);
-                            const listItem = document.createElement('li');
-                            listItem.textContent = name || 'Unnamed Store';
-                            list.appendChild(listItem);
-                        }
-                    });
-                });
-            } catch (error) {
-                console.error('Error fetching supplies:', error);
-                alert('An error occurred while fetching supply data.');
-            }
-        }
-
-        // Trigger the function to populate the data
-        fetchSupplyShortages();
-
-    </script>
 
 </body>
 </html>

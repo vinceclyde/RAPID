@@ -30,6 +30,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     fetchAndDisplayRoadClosures();
                     fetchAndDisplayApprovedRoads();
                 }
+                else if (file === "alert-center.html") {
+                    fetchSupplyShortages();
+                }
             })
             .catch(error => {
                 console.error("Error loading content:", error);
@@ -52,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     document.getElementById("alertCenter").addEventListener("click", () => {
-        window.open("alert-center.html", "_blank");
+        loadContent("alert-center.html", "_blank");
     });
     
 
@@ -1288,5 +1291,73 @@ async function showRoadDetailsPopup(roadId) {
     });
 }
 
+async function fetchSupplyShortages() {
+    const apiBaseUrl = 'http://localhost:5000'; // Added this on this html page but can be omitted once transferred to dashboard.js
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        alert('No token found. Please log in again.');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${apiBaseUrl}/get-supplies`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        const data = await response.json();
+        console.log("API Response:", data); // Debugging line
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Failed to fetch supplies.');
+        }
+
+        // Clear existing lists
+        ['water', 'gas', 'medical', 'food'].forEach(supplyType => {
+            document.getElementById(`${supplyType}-limited`).innerHTML = '';
+            document.getElementById(`${supplyType}-outofstock`).innerHTML = '';
+        });
+
+        // Define color coding for supply types
+        const colorMap = {
+            water: '#2196F3', // Blue
+            gas: '#FF5722',   // Orange
+            medical: '#4CAF50', // Green
+            food: '#FFC107',   // Yellow
+        };
+
+        // Process the grouped API response
+        data.forEach(group => {
+            const supplyType = group._id.toLowerCase(); // e.g., "Water" -> "water"
+            group.supplies.forEach(supply => {
+                const { name, supplyStatus } = supply;
+
+                const listId =
+                    supplyStatus === 'Limited'
+                        ? `${supplyType}-limited`
+                        : supplyStatus === 'Out Of Stock'
+                            ? `${supplyType}-outofstock`
+                            : null;
+
+                if (listId) {
+                    const list = document.getElementById(listId);
+                    const listItem = document.createElement('li');
+                    listItem.textContent = name || 'Unnamed Store';
+
+                    // Apply color based on supply type
+                    listItem.style.color = colorMap[supplyType] || '#000'; // Default to black if not mapped
+                    list.appendChild(listItem);
+                }
+            });
+        });
+    } catch (error) {
+        console.error('Error fetching supplies:', error);
+        alert('An error occurred while fetching supply data.');
+    }
+}
+
+
 window.onload = fetchSupplies();
-window.onload = fetchSupplies1();

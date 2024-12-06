@@ -90,10 +90,11 @@
     color: #333;
 }
 
-ul {                                            /*Added useless CSS para lang pumantay yung fetch data    */
+ul {                                               
     margin-top: 3%;
-    margin-left: -2%;
+    margin-right: %;
     font-size: 10px;
+    list-style-type: none;
 }
 
 .supplystatustitle p {
