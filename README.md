@@ -142,14 +142,6 @@
    <tr>
       <td width="25%">
          <div align="center">
-            <a href="https://docs.google.com/document/d/1Raenmkpt2GracyI4hoXgJgwdfaF5s1DC/edit?usp=sharing&ouid=112972098088168384042&rtpof=true&sd=true">
-               <img src="https://i.ibb.co/zGM2VWL/plan-28-1.png" width="55%">
-            </a>
-            <p>Project Plan</p>
-         </div>
-      </td>
-      <td width="25%">
-         <div align="center">
             <a href="https://drive.google.com/drive/folders/14YdWsfNPUnofs25Nddq7WoeR5iHhVD_q?usp=sharing">
                <img src="https://i.ibb.co/HLyN6mr/9746449.png" width="55%">
             </a>
