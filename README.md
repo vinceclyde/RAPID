@@ -172,5 +172,5 @@
 ### <a name="ack"></a>
 ## 🫡 Acknowledgement
 
-<p align="justify">RAPIDo would like to acknowledge and extend gratitude to our professor for the course Web Systems and Technologies, Ms. Fatima Marie Agdon. Her dedication in guiding us throughout the development of the project has immensely helped us achieve our goals.</p>
+<p align="justify">RAPIDo would like to acknowledge and extend gratitude to our professor for the course Web Systems and Technologies, Ms. Fatima Marie Agdon, MSCS. Her dedication in guiding us throughout the development of the project has immensely helped us achieve our goals.</p>
 
